@@ -1,434 +1,157 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#101525">
-  <meta name="description" content="以六維度偏好與加權規則，探索個人化演員適配推薦。">
-  <title>MatchLens｜受問者適配分析</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101525" />
+    <meta
+      name="description"
+      content="MatchLens 受問者適配分析：透過六維度偏好與加權模型，產生個人化演員推薦。"
+    />
+    <title>MatchLens｜受問者適配分析</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="MatchLens 首頁">Match<span>Lens</span></a>
+      <nav class="nav" aria-label="主導覽">
+        <a href="#overview">專題概覽</a>
+        <a href="#dimensions">六維度</a>
+        <a href="#process">分析流程</a>
+        <a href="survey.html">開始分析</a>
+      </nav>
+    </header>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <main>
+      <section class="hero">
+        <div class="badge">六維度適配分析｜個人化推薦</div>
+        <h1>找到符合你偏好的<br /><span>候選演員</span></h1>
+        <p>
+          透過匿名偏好問卷，依外型風格、氣質人設、作品類型、表演風格、資歷區間與觀看情境進行加權比對，
+          看見清楚、可理解的適配結果。
+        </p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="survey.html">開始偏好分析 <span aria-hidden="true">→</span></a>
+          <a class="secondary-btn" href="#dimensions">探索六維度</a>
+        </div>
+      </section>
 
-    body {
-      font-family: "Noto Sans TC", Arial, sans-serif;
-      background: #101525;
-      color: #f4f6fc;
-      line-height: 1.7;
-    }
+      <section id="overview" class="section intro-section">
+        <p class="section-tag">專題概覽</p>
+        <h2>把個人偏好，轉化為可解釋的適配分析</h2>
+        <p class="section-copy">
+          本專題是「生成式 AI 思維第五組」的課程作品。系統根據使用者問卷與候選資料標籤，
+          以六維度相似度乘上各維度權重計算適配分數，並依分數排序。推薦依據來自明確的規則式比較，
+          不會假稱使用未實際部署的 AI 模型。
+        </p>
+      </section>
 
-    nav {
-      min-height: 76px;
-      padding: 12px 8%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #ffffff15;
-    }
+      <section id="dimensions" class="section dimension-section">
+        <p class="section-tag">六大分析維度</p>
+        <h2>依照既定研究架構，逐項建立偏好模型</h2>
+        <p class="section-copy">
+          六個維度共同構成分析模型；你可以設定各項重要程度，系統會將權重正規化為 100%。
+        </p>
+        <div class="dimension-grid">
+          <article class="dim-card">
+            <div class="dim-number">01 / APPEARANCE</div>
+            <h3>外型風格</h3>
+            <p>比較整體形象與風格走向的偏好標籤。</p>
+          </article>
+          <article class="dim-card">
+            <div class="dim-number">02 / PERSONALITY</div>
+            <h3>氣質人設</h3>
+            <p>依公開形象描述，比較清新、成熟、活潑等氣質偏好。</p>
+          </article>
+          <article class="dim-card">
+            <div class="dim-number">03 / GENRE</div>
+            <h3>作品類型</h3>
+            <p>比較喜愛的劇情題材與敘事類型，可複選或選擇不限。</p>
+          </article>
+          <article class="dim-card">
+            <div class="dim-number">04 / PERFORMANCE</div>
+            <h3>表演風格</h3>
+            <p>依候選資料中的表演風格標籤，比對你的演出偏好。</p>
+          </article>
+          <article class="dim-card">
+            <div class="dim-number">05 / EXPERIENCE</div>
+            <h3>資歷區間</h3>
+            <p>依目前示範資料所標記的發展階段進行比較。</p>
+          </article>
+          <article class="dim-card">
+            <div class="dim-number">06 / VIEWING</div>
+            <h3>觀看情境</h3>
+            <p>分別比較平台、片長與畫質偏好。</p>
+          </article>
+        </div>
+      </section>
 
-    .logo {
-      font-size: 23px;
-      font-weight: 800;
-      letter-spacing: 1px;
-    }
+      <section id="process" class="section process-section">
+        <p class="section-tag">分析流程</p>
+        <h2>從填答到推薦，步驟清楚透明</h2>
+        <p class="section-copy">結果由固定資料標籤與計分規則產生，輸入相同時可重現相同排序。</p>
+        <div class="process-grid">
+          <article class="process-card">
+            <div class="step-index">STEP 01</div>
+            <strong>填寫偏好</strong>
+            <p>依序完成六個維度並設定相對重要程度。</p>
+          </article>
+          <article class="process-card">
+            <div class="step-index">STEP 02</div>
+            <strong>比對標籤</strong>
+            <p>將偏好與結構化候選資料中的標籤逐項比較。</p>
+          </article>
+          <article class="process-card">
+            <div class="step-index">STEP 03</div>
+            <strong>加權計分</strong>
+            <p>以維度相似度和正規化權重計算適配分數。</p>
+          </article>
+          <article class="process-card">
+            <div class="step-index">STEP 04</div>
+            <strong>查看結果</strong>
+            <p>依總分排序，查看推薦候選與維度比較。</p>
+          </article>
+        </div>
+      </section>
 
-    .logo span {
-      color: #8b9cff;
-    }
+      <section class="section summary-section">
+        <div class="summary-panel">
+          <p class="section-tag">計算原理</p>
+          <h2>六維度相似度 × 各維度權重，加總為總適配分數</h2>
+          <p>
+            權重反映你對各維度的相對重視程度，正規化後總和為 100%。目前候選人為虛構示範資料，
+            分數只代表偏好標籤與示範標籤的吻合程度，不代表客觀能力、作品品質或真實人物評價。
+          </p>
+        </div>
+      </section>
 
-    nav a {
-      color: #b9c1d5;
-      text-decoration: none;
-      margin-left: 25px;
-      font-size: 14px;
-    }
+      <section class="section cta-section">
+        <div class="cta-box">
+          <div>
+            <p class="section-tag">立即開始</p>
+            <h2>建立你的六維度偏好模型</h2>
+            <p class="section-copy">匿名填答，不需要提供姓名、電話等個人識別資料。</p>
+          </div>
+          <a class="primary-btn" href="survey.html">前往偏好問卷 <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
 
-    nav a:hover,
-    nav a:focus-visible {
-      color: #c3a5ff;
-    }
+      <aside class="section" aria-labelledby="ethics-title">
+        <div class="summary-panel">
+          <p class="section-tag">資料倫理</p>
+          <h2 id="ethics-title">匿名、示範資料與本機儲存</h2>
+          <p>
+            本專題僅供成年使用者使用。問卷答案保存在目前瀏覽器的本機儲存空間，不會送至伺服器。
+            候選資料是明確標示的虛構示範資料，並非真實人物資料；網站不提供露骨內容或相關影像。
+          </p>
+        </div>
+      </aside>
+    </main>
 
-    .hero {
-      min-height: 590px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 80px 20px;
-      background: radial-gradient(ellipse at 50% 20%, #394a873b, transparent 60%);
-    }
-
-    .tag {
-      color: #a6b4ff;
-      border: 1px solid #6578c866;
-      background: #6578c81a;
-      padding: 7px 18px;
-      border-radius: 30px;
-      font-size: 13px;
-      margin-bottom: 28px;
-    }
-
-    h1 {
-      font-size: clamp(38px, 6vw, 68px);
-      line-height: 1.25;
-      margin-bottom: 25px;
-      letter-spacing: 2px;
-    }
-
-    h1 span {
-      background: linear-gradient(90deg, #92a7ff, #c3a5ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero p {
-      max-width: 640px;
-      color: #aab3c9;
-      font-size: 16px;
-      margin-bottom: 35px;
-    }
-
-    .primary-btn {
-      display: inline-block;
-      padding: 14px 35px;
-      background: linear-gradient(100deg, #687df1, #9b83ed);
-      color: white;
-      text-decoration: none;
-      border-radius: 12px;
-      font-weight: 700;
-      transition: transform .25s, box-shadow .25s;
-    }
-
-    .primary-btn:hover,
-    .primary-btn:focus-visible {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px #7588ff55;
-    }
-
-    section {
-      padding: 75px 8%;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 30px;
-      margin-bottom: 12px;
-    }
-
-    .section-desc {
-      text-align: center;
-      color: #9ba6bd;
-      margin: 0 auto 45px;
-      font-size: 14px;
-      max-width: 680px;
-    }
-
-    .dimensions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .card {
-      background: #1a2235;
-      border: 1px solid #ffffff12;
-      padding: 28px;
-      border-radius: 16px;
-      transition: transform .25s, border-color .25s, background .25s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: #899aff80;
-      background: #202b43;
-    }
-
-    .number {
-      color: #91a4ff;
-      font-size: 13px;
-      margin-bottom: 14px;
-      letter-spacing: 2px;
-    }
-
-    .card h3 {
-      font-size: 19px;
-      margin-bottom: 10px;
-    }
-
-    .card p {
-      color: #9ba6bd;
-      font-size: 14px;
-    }
-
-    .process {
-      background: #171e30;
-      text-align: center;
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      max-width: 1000px;
-      margin: auto;
-    }
-
-    .step {
-      padding: 25px 15px;
-      border: 1px solid #ffffff15;
-      border-radius: 14px;
-      background: #202a40;
-    }
-
-    .step strong {
-      display: block;
-      color: #a6b4ff;
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    .step p {
-      color: #aab3c9;
-      font-size: 13px;
-    }
-
-    .method {
-      max-width: 850px;
-      margin: 35px auto 0;
-      padding: 20px 24px;
-      border: 1px solid #6578c844;
-      border-radius: 14px;
-      background: #6578c810;
-      color: #b9c1d5;
-      font-size: 14px;
-      text-align: left;
-    }
-
-    .method strong {
-      color: #c3caff;
-    }
-
-    .start {
-      text-align: center;
-      padding: 100px 20px;
-    }
-
-    .start p {
-      color: #aab3c9;
-      margin: 15px 0 30px;
-    }
-
-    .ethics {
-      max-width: 1000px;
-      margin: 0 auto 60px;
-      padding: 22px 26px;
-      border: 1px solid #ffffff18;
-      border-radius: 16px;
-      background: #1a2235;
-    }
-
-    .ethics h2 {
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-
-    .ethics p {
-      color: #aab3c9;
-      font-size: 13px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 25px;
-      border-top: 1px solid #ffffff15;
-      color: #78849d;
-      font-size: 12px;
-    }
-
-    @media (max-width: 768px) {
-      nav {
-        padding: 12px 5%;
-      }
-
-      nav a {
-        margin-left: 12px;
-        font-size: 12px;
-      }
-
-      .dimensions {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .steps {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      section {
-        padding: 60px 6%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      nav {
-        align-items: flex-start;
-        gap: 10px;
-        flex-direction: column;
-      }
-
-      nav a {
-        margin: 0 16px 0 0;
-      }
-
-      .hero {
-        min-height: 520px;
-      }
-
-      .dimensions,
-      .steps {
-        grid-template-columns: 1fr;
-      }
-
-      .logo {
-        font-size: 19px;
-      }
-
-      .card {
-        padding: 23px;
-      }
-
-      .ethics {
-        margin: 0 6% 45px;
-        padding: 20px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition-duration: .01ms !important;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <nav aria-label="主要導覽">
-    <div class="logo">Match<span>Lens.</span></div>
-    <div>
-      <a href="#model">六維度模型</a>
-      <a href="#process">分析流程</a>
-      <a href="survey.html">開始分析</a>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="tag">六維度適配分析｜個人化推薦</div>
-    <h1>不只是選擇<br>而是找到<span>最適合</span></h1>
-    <p>
-      每個人都有不同的喜好與觀看需求。MatchLens 透過六維度適配分析，
-      將你的偏好與候選演員的示範特徵標籤進行比較，提供容易理解的個人化推薦。
-    </p>
-    <a href="survey.html" class="primary-btn">開始偏好分析 <span aria-hidden="true">→</span></a>
-  </header>
-
-  <main>
-    <section id="model">
-      <h2 class="section-title">六維度適配模型</h2>
-      <p class="section-desc">
-        依照專題既定的六個分析維度建立偏好模型；使用者可設定各維度重要程度，
-        系統以各維度相似度乘上權重加總，權重總和為 100%。
-      </p>
-
-      <div class="dimensions">
-        <article class="card">
-          <div class="number">01 / APPEARANCE</div>
-          <h3>外型風格</h3>
-          <p>比較整體形象與風格走向的偏好標籤。</p>
-        </article>
-        <article class="card">
-          <div class="number">02 / PERSONALITY</div>
-          <h3>氣質人設</h3>
-          <p>比較清新、成熟、活潑等公開形象描述標籤。</p>
-        </article>
-        <article class="card">
-          <div class="number">03 / GENRE</div>
-          <h3>作品類型</h3>
-          <p>依劇情題材與敘事風格，比對喜愛的作品類型。</p>
-        </article>
-        <article class="card">
-          <div class="number">04 / PERFORMANCE</div>
-          <h3>表演風格</h3>
-          <p>比較互動感、自然度與聲音表現等偏好標籤。</p>
-        </article>
-        <article class="card">
-          <div class="number">05 / EXPERIENCE</div>
-          <h3>資歷區間</h3>
-          <p>依出道年資與作品數量所屬區間進行比較。</p>
-        </article>
-        <article class="card">
-          <div class="number">06 / VIEWING</div>
-          <h3>觀看情境</h3>
-          <p>考量平台、片長與畫質等觀看偏好。</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="process" id="process">
-      <h2 class="section-title">分析如何運作</h2>
-      <p class="section-desc">從填寫偏好到查看排序，分析流程透明且可重現。</p>
-      <div class="steps">
-        <article class="step">
-          <strong>01</strong>
-          <h3>填寫偏好</h3>
-          <p>選擇六維度偏好並設定重要程度。</p>
-        </article>
-        <article class="step">
-          <strong>02</strong>
-          <h3>比對標籤</h3>
-          <p>以結構化候選資料中的特徵標籤逐項比較。</p>
-        </article>
-        <article class="step">
-          <strong>03</strong>
-          <h3>加權計分</h3>
-          <p>依各維度相似度及權重計算總適配分數。</p>
-        </article>
-        <article class="step">
-          <strong>04</strong>
-          <h3>查看推薦</h3>
-          <p>查看排序與各維度分數，理解推薦依據。</p>
-        </article>
-      </div>
-      <div class="method">
-        <strong>方法說明：</strong>
-        這是以問卷答案、示範資料標籤及加權規則進行的適配分析，並未呼叫或訓練生成式 AI 模型。
-        分數反映標籤與偏好的吻合程度，不代表演員的客觀能力或作品品質。
-      </div>
-    </section>
-
-    <section class="start">
-      <h2 class="section-title">開始建立你的偏好模型</h2>
-      <p>問卷匿名填答，不需要提供姓名或電話等個人識別資料。</p>
-      <a href="survey.html" class="primary-btn">前往偏好問卷 <span aria-hidden="true">→</span></a>
-    </section>
-
-    <aside class="ethics" aria-labelledby="ethics-title">
-      <h2 id="ethics-title">使用與資料說明</h2>
-      <p>
-        本專題僅供成年使用者使用。問卷答案僅儲存在目前瀏覽器的本機儲存空間，不會送至伺服器。
-        候選演員目前為虛構示範資料，並非真實人物資料；不包含露骨內容或相關影像。
-        推薦結果僅供參考，請勿視為客觀評價。
-      </p>
-    </aside>
-  </main>
-
-  <footer>
-    生成式 AI 思維第五組｜受問者適配分析｜MatchLens
-  </footer>
-</body>
+    <footer class="footer">
+      <p>生成式 AI 思維第五組｜受問者適配分析｜MatchLens</p>
+      <p class="footnote">課程示範作品｜規則式適配分析，非生成式 AI 模型結果</p>
+    </footer>
+  </body>
 </html>
