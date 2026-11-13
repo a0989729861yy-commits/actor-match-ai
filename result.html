@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推薦結果｜MatchLens</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,"Noto Sans TC",sans-serif;
+  background:#0b1020;
+  color:#f4f5ff;
+  line-height:1.7;
+}
+.container{max-width:1000px;margin:auto;padding:35px 20px 70px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:45px}
+.logo{font-size:22px;font-weight:bold;color:#a99bff}
+a{color:#b7aaff;text-decoration:none}
+.hero{text-align:center;margin-bottom:35px}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero p{color:#aab1ca}
+.summary{
+  background:#171e35;border:1px solid #303957;
+  border-radius:18px;padding:24px;margin-bottom:25px;
+}
+.summary h2{margin-top:0}
+.card{
+  background:#151c31;border:1px solid #303957;
+  border-radius:18px;padding:24px;margin-bottom:18px;
+}
+.rank{color:#b7aaff;font-size:14px;font-weight:bold}
+.person{display:flex;justify-content:space-between;gap:15px;align-items:center}
+.person h2{margin:5px 0;font-size:23px}
+.score{font-size:30px;font-weight:bold;color:#b7aaff;white-space:nowrap}
+.bar{height:9px;background:#303957;border-radius:10px;overflow:hidden;margin:8px 0 18px}
+.fill{height:100%;background:linear-gradient(90deg,#7465df,#b49aff);border-radius:10px}
+.details{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.detail{background:#202943;padding:12px;border-radius:10px}
+.detail strong{display:block;font-size:13px;color:#b7aaff}
+.detail span{font-size:14px}
+.description{color:#b8c0d8;font-size:14px;margin-top:15px}
+.note{color:#929bb6;font-size:13px;margin-top:25px}
+button{
+  border:0;border-radius:10px;padding:12px 20px;
+  background:#8272ed;color:white;font-size:15px;
+  cursor:pointer;margin-top:15px;
+}
+button:hover{background:#9688ff}
+.empty{text-align:center;padding:35px}
+@media(max-width:600px){
+  .container{padding:25px 15px 50px}
+  .hero h1{font-size:27px}
+  .person{align-items:flex-start}
+  .score{font-size:25px}
+  .details{grid-template-columns:1fr}
+  .card{padding:18px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <header>
+    <div class="logo">MatchLens</div>
+    <a href="index.html">返回首頁</a>
+  </header>
+
+  <section class="hero">
+    <h1>你的適配分析結果</h1>
+    <p>根據六個維度與個人偏好權重，整理出推薦排序。</p>
+  </section>
+
+  <section class="summary">
+    <h2>分析說明</h2>
+    <p id="summaryText">正在計算推薦結果……</p>
+  </section>
+
+  <div id="results"></div>
+
+  <p class="note">
+    ※ 本系統採用問卷偏好與資料標籤進行規則式計分，結果僅供參考。
+    推薦分數不代表客觀能力或作品品質，也會受到資料完整度與標籤設定影響。
+  </p>
+
+  <button onclick="location.href='survey.html'">重新填寫問卷</button>
+</div>
+
+<script src="data.js"></script>
+<script>
+const resultsBox = document.getElementById("results");
+const saved = localStorage.getItem("matchlens_preferences");
+
+if (!saved) {
+  resultsBox.innerHTML = `
+    <div class="card empty">
+      <h2>尚未找到問卷資料</h2>
+      <p>請先完成偏好問卷，再查看推薦結果。</p>
+      <button onclick="location.href='survey.html'">前往填寫問卷</button>
+    </div>`;
+} else if (typeof candidates === "undefined" || !Array.isArray(candidates)) {
+  resultsBox.innerHTML = `
+    <div class="card empty">
+      <h2>候選資料讀取失敗</h2>
+      <p>請確認 data.js 已建立並正確載入。</p>
+    </div>`;
+} else {
+  const preferences = JSON.parse(saved);
+
+  const neutralWords = [
+    "沒有特別偏好", "不限", "沒有特別要求",
+    "皆可", "無限制", "不拘"
+  ];
+
+  function isNeutral(value) {
+    if (value === undefined || value === null || value === "") return true;
+    if (Array.isArray(value)) {
+      return value.length === 0 || value.some(v => neutralWords.includes(v));
+    }
+    return neutralWords.includes(String(value));
+  }
+
+  function matchSingle(preference, options) {
+    if (isNeutral(preference)) return 100;
+    if (!Array.isArray(options)) options = [options];
+    return options.includes(preference) ? 100 : 0;
+  }
+
+  function matchMultiple(selected, options) {
+    if (isNeutral(selected)) return 100;
+    if (!Array.isArray(selected)) selected = [selected];
+    if (!Array.isArray(options)) options = [];
+    const matched = selected.filter(item => options.includes(item));
+    return Math.round(matched.length / selected.length * 100);
+  }
+
+  function getDimensionScores(person) {
+    const viewing = preferences.viewing || {};
+    const personViewing = person.viewing || {};
+
+    const viewingScore = (
+      matchSingle(viewing.platform, personViewing.platform) +
+      matchSingle(viewing.duration, personViewing.duration) +
+      matchSingle(viewing.quality, personViewing.quality)
+    ) / 3;
+
+    return [
+      {
+        name: "外型風格",
+        score: matchSingle(preferences.appearance, person.appearance)
+      },
+      {
+        name: "氣質人設",
+        score: matchSingle(preferences.personality, person.personality)
+      },
+      {
+        name: "作品類型",
+        score: matchMultiple(preferences.genres, person.genres)
+      },
+      {
+        name: "表演風格",
+        score: matchSingle(preferences.performance, person.performance)
+      },
+      {
+        name: "資歷區間",
+        score: matchSingle(preferences.experience, person.experience)
+      },
+      {
+        name: "觀看情境",
+        score: Math.round(viewingScore)
+      }
+    ];
+  }
+
+  function getWeights() {
+    const weights = preferences.weights || [];
+    const names = [
+      "外型風格", "氣質人設", "作品類型",
+      "表演風格", "資歷區間", "觀看情境"
+    ];
+
+    return names.map((name, index) => {
+      const item = weights.find(w => w.name === name) || weights[index];
+      return Number(item?.percentage) || 0;
+    });
+  }
+
+  const weights = getWeights();
+
+  const ranked = candidates.map(person => {
+    const dimensions = getDimensionScores(person);
+    const total = dimensions.reduce((sum, item, index) => {
+      return sum + item.score * weights[index] / 100;
+    }, 0);
+
+    return {
+      person,
+      dimensions,
+      total: Math.round(total * 10) / 10
+    };
+  }).sort((a, b) => b.total - a.total);
+
+  document.getElementById("summaryText").textContent =
+    `本次分析共比較 ${candidates.length} 位候選對象，依照你設定的六項偏好權重計算適配分數，並依總分排序。`;
+
+  const topThree = ranked.slice(0, 3);
+
+  if (topThree.length === 0) {
+    resultsBox.innerHTML = "<p>目前沒有可供推薦的資料。</p>";
+  } else {
+    resultsBox.innerHTML = topThree.map((item, index) => {
+      const person = item.person;
+
+      const dimensionHTML = item.dimensions.map(d => `
+        <div class="detail">
+          <strong>${d.name}｜${d.score} 分</strong>
+          <div class="bar"><div class="fill" style="width:${d.score}%"></div></div>
+        </div>
+      `).join("");
+
+      return `
+        <section class="card">
+          <div class="rank">TOP ${index + 1}</div>
+          <div class="person">
+            <div>
+              <h2>${person.name}</h2>
+              <span>${person.category || "候選對象"}</span>
+            </div>
+            <div class="score">${item.total}%</div>
+          </div>
+          <div class="bar">
+            <div class="fill" style="width:${item.total}%"></div>
+          </div>
+          <div class="details">${dimensionHTML}</div>
+          <p class="description">${person.description || "暫無詳細介紹。"}</p>
+        </section>
+      `;
+    }).join("");
+  }
+}
+</script>
+</body>
+</html>
