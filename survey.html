@@ -1,339 +1,145 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>偏好分析｜MatchLens</title>
-<style>
-* { box-sizing:border-box; margin:0; padding:0; }
-body {
-  background:#101525; color:#f4f6fc; font-family:Arial,"Noto Sans TC",sans-serif; line-height:1.7;
-}
-nav {
-  height:70px; padding:0 7%; display:flex; align-items:center; justify-content:space-between;
-  border-bottom:1px solid #ffffff15;
-}
-.logo { font-size:22px; font-weight:bold; }
-.logo span { color:#91a4ff; }
-nav a { color:#aeb9d1; text-decoration:none; font-size:14px; }
-.container { max-width:900px; margin:60px auto; padding:0 20px; }
-.header { margin-bottom:40px; }
-.tag { color:#91a4ff; font-size:13px; letter-spacing:2px; }
-h1 { font-size:38px; margin:12px 0; }
-.subtitle { color:#9ba6bd; font-size:14px; }
-.progress { height:5px; background:#293249; border-radius:10px; margin-top:25px; }
-.progress div { height:100%; width:100%; background:#899cff; border-radius:10px; }
-.card { background:#1a2235; border:1px solid #ffffff14; border-radius:14px; padding:28px; margin-bottom:20px; }
-.card h2 { font-size:21px; margin-bottom:5px; }
-.description { color:#9ba6bd; font-size:13px; margin-bottom:22px; }
-label { display:block; font-size:14px; margin:18px 0 8px; }
-select { width:100%; padding:13px; border-radius:8px; border:1px solid #39435d; background:#111a2c; color:white; font-size:14px; }
-select:focus { outline:2px solid #899cff; }
-input[type="range"] { width:100%; accent-color:#899cff; cursor:pointer; }
-.value { color:#a6b4ff; font-weight:bold; }
-.weight-box { background:#121b2e; border-radius:9px; padding:14px; margin-top:20px; }
-.weight-title { display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; }
-.weight-title span:last-child { color:#a6b4ff; }
-.checkbox-group { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
-.checkbox-group label { background:#121b2e; padding:12px; border-radius:8px; margin:0; cursor:pointer; }
-.checkbox-group input { margin-right:8px; accent-color:#899cff; }
-button { border:none; border-radius:9px; padding:15px 35px; font-size:15px; font-weight:bold; cursor:pointer; }
-.submit { width:100%; background:linear-gradient(100deg,#687df1,#9b83ed); color:white; margin-top:15px; }
-.submit:hover { opacity:.9; }
-.total { color:#a6b4ff; font-size:20px; font-weight:bold; }
-.notice { color:#9ba6bd; font-size:12px; margin-top:12px; }
-#message { margin-top:20px; padding:18px; border-radius:10px; display:none; background:#203a35; color:#a9f0cf; }
-@media(max-width:600px){ h1{font-size:29px;} .card{padding:20px;} .checkbox-group{grid-template-columns:1fr;} }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101525">
+  <meta name="description" content="匿名完成六維度偏好問卷，建立個人化適配分析模型。">
+  <title>偏好問卷｜MatchLens</title>
+  <link rel="stylesheet" href="survey.css">
+  <script src="survey.js" defer></script>
 </head>
 <body>
-<nav>
-  <div class="logo">Match<span>Lens.</span></div>
-  <a href="index.html">← 返回首頁</a>
-</nav>
-
-<main class="container">
-  <header class="header">
-    <div class="tag">PERSONAL PREFERENCE ANALYSIS</div>
-    <h1>建立你的偏好模型</h1>
-    <p class="subtitle">請依照自己的喜好填寫問卷。系統將利用六個維度建立個人化推薦模型。</p>
-    <div class="progress"><div></div></div>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="MatchLens 首頁">Match<span>Lens</span></a>
+    <a class="back-link" href="index.html">← 返回首頁</a>
   </header>
 
-  <form id="surveyForm">
-    <section class="card">
-      <h2>01. 外型風格</h2>
-      <p class="description">選擇你偏好的整體視覺與造型風格。</p>
-      <label>偏好風格</label>
-      <select name="appearance" required>
-        <option value="">請選擇</option>
-        <option>清新自然</option>
-        <option>成熟穩重</option>
-        <option>陽光活潑</option>
-        <option>優雅知性</option>
-        <option>個性時尚</option>
-        <option>沒有特別偏好</option>
-      </select>
-      <div class="weight-box">
-        <div class="weight-title"><span>這個維度對你的重要程度</span><span class="value">3 / 5</span></div>
-        <input type="range" name="wAppearance" min="1" max="5" value="3">
+  <main class="survey-shell">
+    <section class="intro">
+      <p class="eyebrow">PERSONAL PREFERENCE ANALYSIS</p>
+      <h1>建立你的偏好模型</h1>
+      <p class="intro-copy">依序完成六個分析維度，並設定各維度對你的重要程度。你的答案只會保存在此瀏覽器。</p>
+      <div class="progress-meta">
+        <span id="stepLabel">第 1 / 6 步</span>
+        <span id="progressPercent">17%</span>
+      </div>
+      <div class="progress-track" role="progressbar" aria-label="問卷完成進度" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1" id="progressTrack">
+        <div id="progressFill"></div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>02. 氣質人設</h2>
-      <p class="description">選擇你比較欣賞的人物特質。</p>
-      <label>偏好氣質</label>
-      <select name="personality" required>
-        <option value="">請選擇</option>
-        <option>溫柔親切</option>
-        <option>幽默風趣</option>
-        <option>自信獨立</option>
-        <option>沉穩內斂</option>
-        <option>熱情活潑</option>
-        <option>沒有特別偏好</option>
-      </select>
-      <div class="weight-box">
-        <div class="weight-title"><span>重要程度</span><span class="value">3 / 5</span></div>
-        <input type="range" name="wPersonality" min="1" max="5" value="3">
+    <form id="surveyForm" novalidate>
+      <section class="question-card active" data-step="0" aria-labelledby="appearanceTitle">
+        <div class="question-heading"><span class="question-number">01</span><div><h2 id="appearanceTitle">外型風格</h2><p>選擇你偏好的整體形象與風格走向。</p></div></div>
+        <label class="field-label" for="appearance">偏好風格 <span class="required-mark">必填</span></label>
+        <select id="appearance" name="appearance" required>
+          <option value="">請選擇</option>
+          <option>清新自然</option><option>成熟穩重</option><option>陽光活潑</option><option>優雅知性</option><option>個性時尚</option><option>沒有特別偏好</option>
+        </select>
+        <div class="weight-control">
+          <div class="weight-label"><label for="wAppearance">此維度的重要程度</label><output for="wAppearance" id="valueAppearance">3 / 5</output></div>
+          <input id="wAppearance" type="range" name="wAppearance" min="1" max="5" step="1" value="3">
+          <div class="range-hints"><span>較不重要</span><span>非常重要</span></div>
+        </div>
+      </section>
+
+      <section class="question-card" data-step="1" aria-labelledby="personalityTitle" hidden>
+        <div class="question-heading"><span class="question-number">02</span><div><h2 id="personalityTitle">氣質人設</h2><p>選擇你欣賞的公開形象與人物氣質描述。</p></div></div>
+        <label class="field-label" for="personality">偏好氣質 <span class="required-mark">必填</span></label>
+        <select id="personality" name="personality" required>
+          <option value="">請選擇</option>
+          <option>溫柔親切</option><option>幽默風趣</option><option>自信獨立</option><option>沉穩內斂</option><option>熱情活潑</option><option>沒有特別偏好</option>
+        </select>
+        <div class="weight-control">
+          <div class="weight-label"><label for="wPersonality">此維度的重要程度</label><output for="wPersonality" id="valuePersonality">3 / 5</output></div>
+          <input id="wPersonality" type="range" name="wPersonality" min="1" max="5" step="1" value="3">
+          <div class="range-hints"><span>較不重要</span><span>非常重要</span></div>
+        </div>
+      </section>
+
+      <section class="question-card" data-step="2" aria-labelledby="genreTitle" hidden>
+        <div class="question-heading"><span class="question-number">03</span><div><h2 id="genreTitle">作品類型</h2><p>選擇你喜歡的作品題材，可複選；也可以明確選擇不限。</p></div></div>
+        <fieldset class="choice-fieldset">
+          <legend>偏好類型 <span class="required-mark">至少選一項</span></legend>
+          <div class="choice-grid" id="genreOptions">
+            <label class="choice"><input type="checkbox" name="genre" value="喜劇"><span>喜劇</span></label>
+            <label class="choice"><input type="checkbox" name="genre" value="愛情"><span>愛情</span></label>
+            <label class="choice"><input type="checkbox" name="genre" value="科幻"><span>科幻</span></label>
+            <label class="choice"><input type="checkbox" name="genre" value="懸疑"><span>懸疑</span></label>
+            <label class="choice"><input type="checkbox" name="genre" value="動作"><span>動作</span></label>
+            <label class="choice"><input type="checkbox" name="genre" value="劇情"><span>劇情</span></label>
+            <label class="choice"><input type="checkbox" name="genre" value="紀錄片"><span>紀錄片</span></label>
+            <label class="choice"><input type="checkbox" name="genre" value="動畫"><span>動畫</span></label>
+            <label class="choice choice-unlimited"><input type="checkbox" name="genre" value="作品類型不限" id="genreUnlimited"><span>作品類型不限</span></label>
+          </div>
+          <p class="field-error" id="genreError" role="alert" hidden>請至少選擇一個作品類型，或選擇「作品類型不限」。</p>
+        </fieldset>
+        <div class="weight-control">
+          <div class="weight-label"><label for="wGenre">此維度的重要程度</label><output for="wGenre" id="valueGenre">3 / 5</output></div>
+          <input id="wGenre" type="range" name="wGenre" min="1" max="5" step="1" value="3">
+          <div class="range-hints"><span>較不重要</span><span>非常重要</span></div>
+        </div>
+      </section>
+
+      <section class="question-card" data-step="3" aria-labelledby="performanceTitle" hidden>
+        <div class="question-heading"><span class="question-number">04</span><div><h2 id="performanceTitle">表演風格</h2><p>選擇你偏好的演出方式與表現特色。</p></div></div>
+        <label class="field-label" for="performance">偏好表演方式 <span class="required-mark">必填</span></label>
+        <select id="performance" name="performance" required>
+          <option value="">請選擇</option>
+          <option>自然寫實</option><option>情感細膩</option><option>幽默誇張</option><option>感染力強</option><option>風格多變</option><option>沒有特別偏好</option>
+        </select>
+        <div class="weight-control">
+          <div class="weight-label"><label for="wPerformance">此維度的重要程度</label><output for="wPerformance" id="valuePerformance">3 / 5</output></div>
+          <input id="wPerformance" type="range" name="wPerformance" min="1" max="5" step="1" value="3">
+          <div class="range-hints"><span>較不重要</span><span>非常重要</span></div>
+        </div>
+      </section>
+
+      <section class="question-card" data-step="4" aria-labelledby="experienceTitle" hidden>
+        <div class="question-heading"><span class="question-number">05</span><div><h2 id="experienceTitle">資歷區間</h2><p>選擇你感興趣的演員發展階段。</p></div></div>
+        <label class="field-label" for="experience">偏好資歷 <span class="required-mark">必填</span></label>
+        <select id="experience" name="experience" required>
+          <option value="">請選擇</option>
+          <option>新生代演員</option><option>發展中演員</option><option>資深演員</option><option value="不限資歷">不限資歷</option>
+        </select>
+        <div class="weight-control">
+          <div class="weight-label"><label for="wExperience">此維度的重要程度</label><output for="wExperience" id="valueExperience">3 / 5</output></div>
+          <input id="wExperience" type="range" name="wExperience" min="1" max="5" step="1" value="3">
+          <div class="range-hints"><span>較不重要</span><span>非常重要</span></div>
+        </div>
+      </section>
+
+      <section class="question-card" data-step="5" aria-labelledby="viewingTitle" hidden>
+        <div class="question-heading"><span class="question-number">06</span><div><h2 id="viewingTitle">觀看情境</h2><p>分別設定觀看平台、片長與畫質偏好。</p></div></div>
+        <label class="field-label" for="platform">偏好平台 <span class="required-mark">必填</span></label>
+        <select id="platform" name="platform" required><option value="">請選擇</option><option>串流平台</option><option>電影院</option><option>電視</option><option>免費影音平台</option><option value="不限平台">不限平台</option></select>
+        <label class="field-label sub-field" for="duration">偏好片長 <span class="required-mark">必填</span></label>
+        <select id="duration" name="duration" required><option value="">請選擇</option><option>30 分鐘以內</option><option>30～60 分鐘</option><option>60～120 分鐘</option><option>120 分鐘以上</option><option value="不限片長">不限片長</option></select>
+        <label class="field-label sub-field" for="quality">畫質需求 <span class="required-mark">必填</span></label>
+        <select id="quality" name="quality" required><option value="">請選擇</option><option>一般畫質即可</option><option>Full HD</option><option>4K 高畫質</option><option>沒有特別要求</option></select>
+        <div class="weight-control">
+          <div class="weight-label"><label for="wViewing">此維度的重要程度</label><output for="wViewing" id="valueViewing">3 / 5</output></div>
+          <input id="wViewing" type="range" name="wViewing" min="1" max="5" step="1" value="3">
+          <div class="range-hints"><span>較不重要</span><span>非常重要</span></div>
+        </div>
+      </section>
+
+      <section class="weight-summary" aria-labelledby="weightHeading">
+        <div class="summary-heading"><div><p class="eyebrow">WEIGHT DISTRIBUTION</p><h2 id="weightHeading">權重總覽</h2></div><strong id="weightTotal">100.00%</strong></div>
+        <p class="summary-copy">權重依六個重要度的相對比例正規化。顯示值總和固定為 100.00%，計分及儲存保留原始精度。</p>
+        <div id="weightSummary" class="weight-list"></div>
+      </section>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" id="previousButton">上一題</button>
+        <span class="action-spacer"></span>
+        <button type="button" class="btn btn-primary" id="nextButton">下一題 <span aria-hidden="true">→</span></button>
+        <button type="submit" class="btn btn-primary" id="submitButton" hidden>儲存偏好</button>
       </div>
-    </section>
-
-    <section class="card">
-      <h2>03. 作品類型</h2>
-      <p class="description">選擇你平常喜歡觀看的作品類型，可複選。若不想限制題材，可選擇「作品類型不限」。</p>
-      <div class="checkbox-group">
-        <label><input type="checkbox" name="genre" value="喜劇">喜劇</label>
-        <label><input type="checkbox" name="genre" value="愛情">愛情</label>
-        <label><input type="checkbox" name="genre" value="科幻">科幻</label>
-        <label><input type="checkbox" name="genre" value="懸疑">懸疑</label>
-        <label><input type="checkbox" name="genre" value="動作">動作</label>
-        <label><input type="checkbox" name="genre" value="劇情">劇情</label>
-        <label><input type="checkbox" name="genre" value="紀錄片">紀錄片</label>
-        <label><input type="checkbox" name="genre" value="動畫">動畫</label>
-        <label><input type="checkbox" name="genre" value="作品類型不限" id="genreUnlimited">作品類型不限</label>
-      </div>
-      <div class="weight-box">
-        <div class="weight-title"><span>重要程度</span><span class="value">3 / 5</span></div>
-        <input type="range" name="wGenre" min="1" max="5" value="3">
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>04. 表演風格</h2>
-      <p class="description">選擇你偏好的演出表現。</p>
-      <label>偏好表演方式</label>
-      <select name="performance" required>
-        <option value="">請選擇</option>
-        <option>自然寫實</option>
-        <option>情感細膩</option>
-        <option>幽默誇張</option>
-        <option>感染力強</option>
-        <option>風格多變</option>
-        <option>沒有特別偏好</option>
-      </select>
-      <div class="weight-box">
-        <div class="weight-title"><span>重要程度</span><span class="value">3 / 5</span></div>
-        <input type="range" name="wPerformance" min="1" max="5" value="3">
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>05. 資歷區間</h2>
-      <p class="description">選擇你比較感興趣的演員發展階段。</p>
-      <label>偏好資歷</label>
-      <select name="experience" required>
-        <option value="">請選擇</option>
-        <option>新生代演員</option>
-        <option>發展中演員</option>
-        <option>資深演員</option>
-        <option value="不限資歷">不限資歷</option>
-      </select>
-      <div class="weight-box">
-        <div class="weight-title"><span>重要程度</span><span class="value">3 / 5</span></div>
-        <input type="range" name="wExperience" min="1" max="5" value="3">
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>06. 觀看情境</h2>
-      <p class="description">設定你習慣的觀看方式。</p>
-      <label>偏好平台</label>
-      <select name="platform" required>
-        <option value="">請選擇</option>
-        <option>串流平台</option>
-        <option>電影院</option>
-        <option>電視</option>
-        <option>免費影音平台</option>
-        <option value="不限平台">不限平台</option>
-      </select>
-      <label>偏好片長</label>
-      <select name="duration" required>
-        <option value="">請選擇</option>
-        <option>30 分鐘以內</option>
-        <option>30～60 分鐘</option>
-        <option>60～120 分鐘</option>
-        <option>120 分鐘以上</option>
-        <option value="不限片長">不限片長</option>
-      </select>
-      <label>畫質需求</label>
-      <select name="quality" required>
-        <option value="">請選擇</option>
-        <option>一般畫質即可</option>
-        <option>Full HD</option>
-        <option>4K 高畫質</option>
-        <option>沒有特別要求</option>
-      </select>
-      <div class="weight-box">
-        <div class="weight-title"><span>重要程度</span><span class="value">3 / 5</span></div>
-        <input type="range" name="wViewing" min="1" max="5" value="3">
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>權重設定</h2>
-      <p class="description">調整六個維度的重要性，系統會自動換算百分比。</p>
-      <div id="weightSummary"></div>
-      <p class="notice">權重會依照六個維度的相對重要程度自動正規化，最終總和固定為 100%。</p>
-      <p style="margin-top:20px">目前權重總和：<span class="total" id="totalWeight">100%</span></p>
-    </section>
-
-    <button type="submit" class="submit">儲存偏好資料 →</button>
-    <p class="notice">本問卷資料僅儲存在目前瀏覽器的本機儲存空間。</p>
-    <div id="message"></div>
-  </form>
-</main>
-
-<script>
-const dimensions = [
-  ["外型風格", "wAppearance"],
-  ["氣質人設", "wPersonality"],
-  ["作品類型", "wGenre"],
-  ["表演風格", "wPerformance"],
-  ["資歷區間", "wExperience"],
-  ["觀看情境", "wViewing"]
-];
-const form = document.getElementById("surveyForm");
-const genreUnlimited = document.getElementById("genreUnlimited");
-const allGenreInputs = [...document.querySelectorAll('input[name="genre"]')];
-
-function getRawWeights() {
-  const values = dimensions.map(([, name]) => Number(form.elements[name].value));
-  const total = values.reduce((sum, value) => sum + value, 0);
-  return values.map((value, index) => ({
-    name: dimensions[index][0],
-    score: value,
-    percentage: total === 0 ? 0 : value / total * 100
-  }));
-}
-
-function getDisplayWeights() {
-  const rawWeights = getRawWeights();
-  const exact = rawWeights.map(item => item.percentage * 100);
-  const floored = exact.map(v => Math.floor(v));
-  let remainder = 10000 - floored.reduce((sum, value) => sum + value, 0);
-  const order = exact.map((v, idx) => ({ idx, diff: v - floored[idx] })).sort((a, b) => b.diff - a.diff || a.idx - b.idx);
-  for (let i = 0; i < remainder; i += 1) {
-    floored[order[i].idx] += 1;
-  }
-  return rawWeights.map((item, idx) => ({
-    ...item,
-    displayPercentage: floored[idx] / 100
-  }));
-}
-
-function updateWeights() {
-  const weights = getDisplayWeights();
-  document.querySelectorAll('input[type="range"]').forEach(input => {
-    const valueNode = input.previousElementSibling;
-    if (valueNode && valueNode.classList.contains('value')) {
-      valueNode.textContent = input.value + ' / 5';
-    }
-    const parent = input.parentElement;
-    const valueBox = parent.querySelector('.value');
-    if (valueBox) valueBox.textContent = input.value + ' / 5';
-  });
-
-  document.getElementById('weightSummary').innerHTML = weights.map(item => `
-    <div style="margin:14px 0">
-      <div class="weight-title">
-        <span>${item.name}</span>
-        <span>${item.displayPercentage.toFixed(2)}%</span>
-      </div>
-      <div style="height:6px;background:#303a52;border-radius:10px">
-        <div style="height:6px;width:${item.displayPercentage}%;background:#91a4ff;border-radius:10px"></div>
-      </div>
-    </div>
-  `).join('');
-
-  const total = weights.reduce((sum, item) => sum + item.displayPercentage, 0);
-  document.getElementById('totalWeight').textContent = total.toFixed(2) + '%';
-}
-
-function hasGenreSelection() {
-  const checked = allGenreInputs.filter(input => input.checked);
-  return checked.length > 0;
-}
-
-function ensureNeutralGenre() {
-  if (genreUnlimited.checked) {
-    allGenreInputs.filter(input => input !== genreUnlimited).forEach(input => input.checked = false);
-  }
-}
-
-genreUnlimited.addEventListener('change', ensureNeutralGenre);
-allGenreInputs.forEach(input => {
-  if (input !== genreUnlimited) {
-    input.addEventListener('change', () => {
-      if (input.checked) genreUnlimited.checked = false;
-    });
-  }
-});
-
-form.addEventListener("input", updateWeights);
-
-form.addEventListener("submit", function(event) {
-  event.preventDefault();
-  if (!form.reportValidity()) return;
-  if (!hasGenreSelection()) {
-    const firstGenre = allGenreInputs[0];
-    if (firstGenre) firstGenre.focus();
-    alert('請至少選擇一個作品類型，或選擇「作品類型不限」。');
-    return;
-  }
-
-  const rawWeights = getRawWeights();
-  const data = {
-    appearance: form.elements.appearance.value,
-    personality: form.elements.personality.value,
-    genres: allGenreInputs.filter(input => input.checked).map(input => input.value),
-    performance: form.elements.performance.value,
-    experience: form.elements.experience.value,
-    viewing: {
-      platform: form.elements.platform.value,
-      duration: form.elements.duration.value,
-      quality: form.elements.quality.value
-    },
-    weights: rawWeights,
-    savedAt: new Date().toISOString()
-  };
-
-  try {
-    localStorage.setItem("matchlens_preferences", JSON.stringify(data));
-    const message = document.getElementById("message");
-    message.style.display = "block";
-    message.innerHTML = `
-      <strong>偏好資料已成功儲存！</strong>
-      <p>六維度偏好與權重已保存。</p>
-      <p><a href="result.html">下一步：查看推薦結果</a></p>
-    `;
-    message.scrollIntoView({ behavior: "smooth", block: "center" });
-  } catch (error) {
-    alert("資料儲存失敗，請檢查瀏覽器儲存空間。");
-  }
-});
-
-updateWeights();
-</script>
+      <p class="privacy-note">匿名填答：答案只儲存在本機瀏覽器的 <code>matchlens_preferences</code>，不會傳送至伺服器。</p>
+      <div id="formMessage" class="form-message" role="status" aria-live="polite" hidden></div>
+    </form>
+  </main>
 </body>
 </html>
