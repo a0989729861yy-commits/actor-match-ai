@@ -1,472 +1,188 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>推薦結果｜MatchLens</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,"Noto Sans TC",sans-serif;background:#0b1020;color:#f4f5ff;line-height:1.7}
-.container{max-width:1100px;margin:auto;padding:35px 20px 70px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:38px}
-.logo{font-size:22px;font-weight:bold;color:#a99bff}
-a{color:#b7aaff;text-decoration:none}
-a:hover,a:focus-visible{color:#d2c8ff;text-decoration:underline}
-.hero{text-align:center;margin-bottom:30px}
-.hero h1{font-size:34px;margin:0 0 10px}
-.hero p{color:#aab1ca;margin:0}
-.summary,.card,.panel{background:#151c31;border:1px solid #303957;border-radius:18px;padding:24px;margin-bottom:18px}
-.summary{background:#171e35}
-.summary h2,.panel h2{margin:0 0 8px;font-size:21px}
-.section-intro{color:#aab1ca;font-size:14px;margin:0 0 20px}
-.card{padding:22px}
-.rank{color:#b7aaff;font-size:14px;font-weight:bold;letter-spacing:.04em}
-.person{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:4px 0 12px}
-.person h2{margin:4px 0;font-size:23px}
-.category{color:#aab1ca;font-size:13px}
-.score{font-size:30px;font-weight:bold;color:#c5b5ff;white-space:nowrap}
-.bar{height:9px;background:#303957;border-radius:10px;overflow:hidden;margin:8px 0 18px}
-.fill{height:100%;background:linear-gradient(90deg,#7465df,#b49aff);border-radius:10px}
-.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.detail{background:#202943;padding:12px;border-radius:10px}
-.detail strong{display:block;font-size:13px;color:#c5b5ff}
-.detail .bar{margin:8px 0 0}
-.description{color:#b8c0d8;font-size:14px;margin:15px 0 0}
-.reason-block{margin-top:18px;padding-top:16px;border-top:1px solid #ffffff12}
-.reason-block h3{font-size:15px;margin:0 0 8px;color:#e5e9ff}
-.reason-block p,.reason-block li{color:#b8c0d8;font-size:13px}
-.reason-block ul{margin:0;padding-left:20px}
-.reason-block li+li{margin-top:4px}
-.reason-muted{color:#929bb6!important}
-.compare-list{display:grid;gap:18px}
-.compare-row{padding:16px;background:#10182b;border:1px solid #ffffff0d;border-radius:12px}
-.compare-row h3{font-size:15px;margin:0 0 12px}
-.compare-series{display:grid;gap:10px}
-.compare-item{display:grid;grid-template-columns:minmax(90px,130px) minmax(0,1fr) 54px;align-items:center;gap:10px;font-size:12px;color:#c3cbe0}
-.compare-track{height:12px;border-radius:999px;background:#2c3550;overflow:hidden}
-.compare-fill{height:100%;border-radius:inherit;transition:width .3s ease}
-.compare-fill.series-0{background:#8c9cff}.compare-fill.series-1{background:#b18df3}.compare-fill.series-2{background:#62d5c3}
-.compare-value{text-align:right;font-variant-numeric:tabular-nums;color:#eef0ff}
-.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0 0 16px;color:#bdc5d9;font-size:12px}
-.legend-item{display:inline-flex;align-items:center;gap:7px}
-.legend-swatch{width:10px;height:10px;border-radius:50%;display:inline-block}
-.legend-swatch.series-0{background:#8c9cff}.legend-swatch.series-1{background:#b18df3}.legend-swatch.series-2{background:#62d5c3}
-.feedback-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.feedback-field label{display:block;margin:0 0 7px;font-size:13px;color:#d4daea}
-.feedback-field select{width:100%;padding:12px;border:1px solid #39435d;border-radius:9px;background:#10182b;color:#f4f5ff;font-size:14px}
-.feedback-field select:focus{outline:2px solid #899cff;outline-offset:2px}
-button{border:0;border-radius:10px;padding:12px 20px;background:#8272ed;color:white;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px}
-button:hover{background:#9688ff}
-button:focus-visible{outline:2px solid #fff;outline-offset:3px}
-.feedback-notice,.note{color:#929bb6;font-size:13px;margin-top:15px}
-.feedback-status{display:none;margin-top:14px;padding:12px 14px;border-radius:10px;background:#203a35;color:#a9f0cf;font-size:14px}
-.feedback-status.error{background:#43252f;color:#ffd2da}
-.empty{text-align:center;padding:35px}
-.error-title{margin:0 0 8px}
-@media(max-width:720px){.feedback-grid{grid-template-columns:1fr}.compare-item{grid-template-columns:minmax(82px,105px) minmax(0,1fr) 48px;gap:7px}.container{padding:25px 15px 50px}}
-@media(max-width:600px){.hero h1{font-size:27px}.person{align-items:flex-start}.score{font-size:25px}.details{grid-template-columns:1fr}.card,.summary,.panel{padding:18px}.compare-row{padding:13px}.compare-item{font-size:11px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101525">
+  <title>推薦結果｜MatchLens</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#0b1020;color:#f4f5ff;font:16px/1.7 Arial,"Noto Sans TC",sans-serif}.container{max-width:1100px;margin:auto;padding:30px 18px 64px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.logo{font-size:22px;font-weight:800;color:#a99bff}a{color:#c4b8ff}a:hover,a:focus-visible{color:#fff}.hero{text-align:center;margin:0 0 25px}.hero h1{font-size:clamp(26px,5vw,36px);margin:0 0 8px}.hero p,.muted{color:#aab1ca}.panel,.card,.summary{padding:22px;background:#151c31;border:1px solid #303957;border-radius:16px;margin-bottom:16px}.summary{background:#171e35}.summary h2,.panel h2{font-size:20px;margin:0 0 8px}.status{padding:13px 15px;border-radius:10px;background:#202943;color:#d7deee;margin-bottom:16px}.status.error{background:#43252f;color:#ffd2da}.status[hidden]{display:none}.spinner{display:inline-block;width:14px;height:14px;margin-right:8px;border:2px solid #8b9cff;border-right-color:transparent;border-radius:50%;vertical-align:-2px;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.rank{font-size:13px;font-weight:700;color:#b7aaff}.person{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:5px 0 12px}.person h2{font-size:22px;margin:0}.score{font-size:26px;font-weight:800;color:#c5b5ff;white-space:nowrap}.bar,.compare-track{height:9px;border-radius:999px;background:#303957;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#7465df,#b49aff)}.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}.detail{padding:10px;background:#202943;border-radius:9px}.detail strong{font-size:13px;color:#c5b5ff}.detail .bar{margin-top:7px}.reason{border-top:1px solid #ffffff15;margin-top:16px;padding-top:12px}.reason h3{margin:0 0 6px;font-size:15px}.reason p,.reason li,.section-intro{font-size:14px;color:#bdc5d9}.reason ul{margin:5px 0;padding-left:20px}.compare-list{display:grid;gap:12px}.compare-row{padding:12px;background:#10182b;border-radius:10px}.compare-row h3{font-size:14px;margin:0 0 8px}.compare-series{display:grid;gap:7px}.compare-item{display:grid;grid-template-columns:minmax(90px,130px) 1fr 48px;align-items:center;gap:8px;font-size:12px}.compare-fill{height:100%;border-radius:999px;background:#8c9cff}.works{display:grid;gap:8px}.work{padding:10px;background:#202943;border-radius:9px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.button{border:0;border-radius:9px;padding:11px 16px;background:#8272ed;color:white;font-weight:700;cursor:pointer;text-decoration:none}.button:hover{background:#9688ff}.button:disabled{opacity:.55;cursor:wait}.badge{display:inline-block;padding:3px 9px;border-radius:999px;background:#403718;color:#f1d795;font-size:12px}.badge.verified{background:#203a35;color:#a9f0cf}.source-list{overflow-wrap:anywhere;padding-left:20px}.feedback-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.feedback-field label{display:block;font-size:13px;margin-bottom:5px}.feedback-field select{width:100%;padding:10px;background:#10182b;color:#f4f5ff;border:1px solid #39435d;border-radius:8px}.feedback-status{margin-top:10px;color:#a9f0cf}.note{font-size:13px;color:#929bb6;margin:18px 0}@media(max-width:680px){.container{padding:20px 13px 48px}.panel,.card,.summary{padding:16px}.details,.feedback-grid{grid-template-columns:1fr}.compare-item{grid-template-columns:minmax(80px,100px) 1fr 45px}.person{align-items:flex-start}.score{font-size:23px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
 </head>
 <body>
-<div class="container">
-  <header><div class="logo">MatchLens</div><a href="index.html">返回首頁</a></header>
-  <section class="hero"><h1>你的適配分析結果</h1><p>根據六個維度與個人偏好權重，整理出推薦排序。</p></section>
-  <section class="summary"><h2>分析說明</h2><p id="summaryText">正在計算推薦結果……</p></section>
-  <main id="results" aria-live="polite"></main>
-  <p class="note">※ 本系統採用問卷偏好與資料標籤進行規則式計分，結果僅供參考。推薦分數不代表客觀能力或作品品質，也會受到資料完整度與標籤設定影響。</p>
-  <button type="button" id="editPreferences">重新填寫問卷</button>
-</div>
-<script src="data.js"></script>
-<script>
-const resultsBox = document.getElementById("results");
-const summaryText = document.getElementById("summaryText");
-const editPreferences = document.getElementById("editPreferences");
-const FEEDBACK_KEY = "matchlens_feedback";
-const saved = localStorage.getItem("matchlens_preferences");
-const neutralValues = new Set([
-  "沒有特別偏好", "沒有特別要求", "皆可", "無限制", "不拘",
-  "不限資歷", "不限平台", "不限片長", "作品類型不限"
-]);
-
-function isNeutral(value) {
-  // Empty/missing values are not neutral; required survey responses must exist.
-  return typeof value === "string" && neutralValues.has(value);
-}
-
-function matchSingle(preference, options) {
-  if (isNeutral(preference)) return 100;
-  if (preference === undefined || preference === null || preference === "") return 0;
-  const labels = Array.isArray(options) ? options : [options];
-  return labels.includes(preference) ? 100 : 0;
-}
-
-function matchMultiple(selected, options) {
-  if (!Array.isArray(selected) || selected.length === 0) return 0;
-  if (selected.includes("作品類型不限")) return 100;
-  const labels = Array.isArray(options) ? options : [];
-  const matched = selected.filter(item => labels.includes(item));
-  return Math.round(matched.length / selected.length * 100);
-}
-
-function getDimensionScores(preferences, person) {
-  const viewing = preferences.viewing || {};
-  const personViewing = person.viewing || {};
-  const viewingScore = (
-    matchSingle(viewing.platform, personViewing.platform) +
-    matchSingle(viewing.duration, personViewing.duration) +
-    matchSingle(viewing.quality, personViewing.quality)
-  ) / 3;
-
-  return [
-    { name: "外型風格", score: matchSingle(preferences.appearance, person.appearance) },
-    { name: "氣質人設", score: matchSingle(preferences.personality, person.personality) },
-    { name: "作品類型", score: matchMultiple(preferences.genres, person.genres) },
-    { name: "表演風格", score: matchSingle(preferences.performance, person.performance) },
-    { name: "資歷區間", score: matchSingle(preferences.experience, person.experience) },
-    { name: "觀看情境", score: Math.round(viewingScore) }
-  ];
-}
-
-function getWeights(preferences) {
-  const names = ["外型風格", "氣質人設", "作品類型", "表演風格", "資歷區間", "觀看情境"];
-  const savedWeights = Array.isArray(preferences.weights) ? preferences.weights : [];
-  const items = names.map((name, index) => savedWeights.find(item => item && item.name === name) || savedWeights[index]);
-  const rawScores = items.map(item => Number(item?.score));
-  const hasValidRawScores = rawScores.every(value => Number.isFinite(value) && value > 0);
-  const source = hasValidRawScores ? rawScores : items.map(item => Number(item?.percentage));
-  const validSource = source.every(value => Number.isFinite(value) && value >= 0);
-  const total = source.reduce((sum, value) => sum + value, 0);
-
-  if (!validSource || total <= 0) return names.map(() => 100 / names.length);
-  // Re-normalize from raw importance scores when present; never score with rounded display values.
-  return source.map(value => value / total * 100);
-}
-
-function element(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined && text !== null) node.textContent = String(text);
-  return node;
-}
-
-function showError(title, detail, actionLabel) {
-  resultsBox.replaceChildren();
-  const box = element("section", "card empty");
-  box.append(element("h2", "error-title", title), element("p", "", detail));
-  if (actionLabel) {
-    const action = element("button", "", actionLabel);
-    action.type = "button";
-    action.addEventListener("click", () => { window.location.href = "survey.html"; });
-    box.append(action);
-  }
-  resultsBox.append(box);
-}
-
-function getPreferenceForDimension(preferences, name) {
-  const preferenceByDimension = {
-    "外型風格": preferences.appearance,
-    "氣質人設": preferences.personality,
-    "作品類型": preferences.genres,
-    "表演風格": preferences.performance,
-    "資歷區間": preferences.experience
-  };
-  return preferenceByDimension[name];
-}
-
-function getMatchingLabels(name, preferences, person) {
-  if (name === "觀看情境") {
-    const userViewing = preferences.viewing || {};
-    const candidateViewing = person.viewing || {};
-    const matched = [];
-    [["平台", "platform"], ["片長", "duration"], ["畫質", "quality"]].forEach(([label, key]) => {
-      const preferred = userViewing[key];
-      if (!isNeutral(preferred) && preferred && matchSingle(preferred, candidateViewing[key]) === 100) {
-        matched.push(`${label}：${preferred}`);
-      }
-    });
-    return matched;
-  }
-
-  const preferred = getPreferenceForDimension(preferences, name);
-  if (name === "作品類型") {
-    if (!Array.isArray(preferred) || preferred.includes("作品類型不限")) return [];
-    const candidateLabels = Array.isArray(person.genres) ? person.genres : [];
-    return preferred.filter(label => candidateLabels.includes(label));
-  }
-  if (isNeutral(preferred) || !preferred) return [];
-  const candidateLabels = Array.isArray(person[name === "外型風格" ? "appearance" : name === "氣質人設" ? "personality" : "performance"]) ? person[name === "外型風格" ? "appearance" : name === "氣質人設" ? "personality" : "performance"] : [];
-  return candidateLabels.includes(preferred) ? [preferred] : [];
-}
-
-function getPreferenceLabels(name, preferences) {
-  if (name === "觀看情境") {
-    const viewing = preferences.viewing || {};
-    return [["平台", viewing.platform], ["片長", viewing.duration], ["畫質", viewing.quality]]
-      .filter(([, value]) => value && !isNeutral(value))
-      .map(([label, value]) => `${label}：${value}`);
-  }
-  const preferred = getPreferenceForDimension(preferences, name);
-  if (name === "作品類型") {
-    if (!Array.isArray(preferred) || preferred.includes("作品類型不限")) return [];
-    return preferred;
-  }
-  if (!preferred || isNeutral(preferred)) return [];
-  return [preferred];
-}
-
-function buildRecommendationSummary(item) {
-  const strongMatches = item.dimensions.filter(d => d.score === 100 && getPreferenceLabels(d.name, preferences).length > 0).map(d => d.name);
-  const scoreText = `${item.total}%`;
-  if (strongMatches.length) return `整體適配度為 ${scoreText}；依本次偏好，${strongMatches.join("、")}與候選資料標籤完全相符。`;
-  const best = item.dimensions.filter(d => d.score > 0).sort((a, b) => b.score - a.score)[0];
-  if (best) return `整體適配度為 ${scoreText}；目前較符合的維度是「${best.name}」（${best.score} 分）。`;
-  return `整體適配度為 ${scoreText}；依本次偏好與目前示範標籤，沒有維度達到完全相符。`;
-}
-
-function buildReasons(item) {
-  const matches = [];
-  const gaps = [];
-  item.dimensions.forEach(dimension => {
-    const expected = getPreferenceLabels(dimension.name, preferences);
-    if (!expected.length) return;
-    const matched = getMatchingLabels(dimension.name, preferences, item.person);
-    if (dimension.score === 100) {
-      matches.push(`${dimension.name}：${matched.length ? matched.join("、") : "偏好標籤相符"}`);
-    } else if (dimension.name === "作品類型" && matched.length) {
-      matches.push(`${dimension.name}：符合 ${matched.join("、")}（維度分數 ${dimension.score} 分）`);
-      const missing = expected.filter(label => !matched.includes(label));
-      if (missing.length) gaps.push(`${dimension.name}：尚未匹配 ${missing.join("、")}`);
-    } else if (dimension.name === "觀看情境") {
+  <div class="container">
+    <header><div class="logo">MatchLens</div><a href="index.html">返回首頁</a></header>
+    <section class="hero"><h1>你的適配分析結果</h1><p>沿用問卷六維度與原始權重計算；伺服器可選擇以 Gemini 補充說明。</p></section>
+    <div id="status" class="status" role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span>正在讀取偏好並向推薦服務請求結果……</div>
+    <section class="summary"><h2>分析說明</h2><p id="summaryText" class="muted">正在計算推薦結果……</p></section>
+    <main id="results" aria-live="polite"></main>
+    <p class="note">推薦分數是問卷偏好與示範標籤的規則式吻合程度，不代表客觀能力或作品品質。當前示範候選並非真實人物；來源資料不足時不作真實人物背書。Gemini 只用於文字說明，不負責計分。</p>
+    <button class="button" id="editPreferences" type="button">重新填寫問卷</button>
+  </div>
+  <script src="data.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const PREFERENCE_KEY = 'matchlens_preferences';
+    const FEEDBACK_KEY = 'matchlens_feedback';
+    const DIMENSIONS = ['外型風格', '氣質人設', '作品類型', '表演風格', '資歷區間', '觀看情境'];
+    const resultsBox = document.getElementById('results');
+    const summaryText = document.getElementById('summaryText');
+    const statusBox = document.getElementById('status');
+    const neutralValues = new Set(['沒有特別偏好','沒有特別要求','皆可','無限制','不拘','不限資歷','不限平台','不限片長','作品類型不限']);
+    const isNeutral = value => typeof value === 'string' && neutralValues.has(value);
+    const element = (tag, cls, text) => { const node = document.createElement(tag); if (cls) node.className = cls; if (text !== undefined && text !== null) node.textContent = String(text); return node; };
+    function matchSingle(preference, options) {
+      if (isNeutral(preference)) return 100;
+      if (preference === undefined || preference === null || preference === '') return 0;
+      return (Array.isArray(options) ? options : [options]).includes(preference) ? 100 : 0;
+    }
+    function matchMultiple(selected, options) {
+      if (!Array.isArray(selected) || selected.length === 0) return 0;
+      if (selected.includes('作品類型不限')) return 100;
+      const labels = Array.isArray(options) ? options : [];
+      return Math.round(selected.filter(value => labels.includes(value)).length / selected.length * 100);
+    }
+    function getWeights(preferences) {
+      const saved = Array.isArray(preferences.weights) ? preferences.weights : [];
+      const items = DIMENSIONS.map((name, index) => saved.find(item => item && item.name === name) || saved[index]);
+      const raw = items.map(item => Number(item?.score));
+      const hasRaw = raw.every(value => Number.isFinite(value) && value > 0);
+      const values = hasRaw ? raw : items.map(item => Number(item?.percentage));
+      const total = values.reduce((sum, value) => sum + value, 0);
+      if (!values.every(value => Number.isFinite(value) && value >= 0) || total <= 0) return DIMENSIONS.map(() => 100 / 6);
+      return values.map(value => value / total * 100);
+    }
+    function getDimensionScores(preferences, person) {
       const viewing = preferences.viewing || {};
-      const personViewing = item.person.viewing || {};
-      [["平台", "platform"], ["片長", "duration"], ["畫質", "quality"]].forEach(([label, key]) => {
-        const value = viewing[key];
-        if (!value || isNeutral(value)) return;
-        if (matchSingle(value, personViewing[key]) === 100) matches.push(`觀看情境｜${label}：${value}`);
-        else gaps.push(`觀看情境｜${label}：未匹配「${value}」`);
+      const pv = person.viewing || {};
+      const viewingScore = (matchSingle(viewing.platform,pv.platform)+matchSingle(viewing.duration,pv.duration)+matchSingle(viewing.quality,pv.quality))/3;
+      return [
+        {name:'外型風格',score:matchSingle(preferences.appearance,person.appearance)},
+        {name:'氣質人設',score:matchSingle(preferences.personality,person.personality)},
+        {name:'作品類型',score:matchMultiple(preferences.genres,person.genres)},
+        {name:'表演風格',score:matchSingle(preferences.performance,person.performance)},
+        {name:'資歷區間',score:matchSingle(preferences.experience,person.experience)},
+        {name:'觀看情境',score:Math.round(viewingScore)}
+      ];
+    }
+    function localRanking(preferences) {
+      const weights = getWeights(preferences);
+      return candidates.map(person => {
+        const dimensions = getDimensionScores(preferences,person);
+        const total = Math.round(dimensions.reduce((sum,item,index)=>sum+item.score*weights[index]/100,0)*10)/10;
+        return {rank:0,name:person.name,category:person.category,score:total,description:person.description,personId:person.id,dimensions,works:person.works||[],sourceStatus:'demo',evidence:{sourceStatus:'demo',note:'本機示範資料，並非已驗證的真實人物資料。',verifiedAt:null,sourceUrls:[]},bestMatches:dimensions.filter(d=>d.score===100).map(d=>d.name),gaps:dimensions.filter(d=>d.score<50).map(d=>d.name)};
+      }).sort((a,b)=>b.score-a.score).slice(0,3).map((item,index)=>({...item,rank:index+1}));
+    }
+    function showError(title, message, action=true) {
+      resultsBox.replaceChildren();
+      const box = element('section','card'); box.append(element('h2','',title),element('p','muted',message));
+      if(action){const link=element('a','button','前往填寫問卷');link.href='survey.html';box.append(link);}
+      resultsBox.append(box);
+    }
+    function scoreBar(value, cls='fill') { const track=element('div','bar');const fill=element('div',cls);fill.style.width=`${Math.max(0,Math.min(100,Number(value)||0))}%`;track.append(fill);return track; }
+    function renderComparison(ranking) {
+      const panel=element('section','panel');panel.append(element('h2','','TOP 1–3 六維度比較'),element('p','section-intro','依伺服器回傳的既有計分結果呈現，沒有另行計分。'));
+      const list=element('div','compare-list');
+      DIMENSIONS.forEach(name=>{const row=element('div','compare-row');row.append(element('h3','',name));const series=element('div','compare-series');ranking.forEach((item,index)=>{const d=(item.dimensions||[]).find(x=>x.name===name);const score=Number(d?.score)||0;const line=element('div','compare-item');line.append(element('span','',`TOP ${index+1} ${item.name}`));const track=element('div','compare-track');const fill=element('div','compare-fill');fill.style.width=`${Math.max(0,Math.min(100,score))}%`;track.append(fill);line.append(track,element('span','',`${score} 分`));series.append(line);});row.append(series);list.append(row);});
+      panel.append(list);return panel;
+    }
+    function matchingReasons(item, preferences) {
+      const p=item.person||{};const matched=[];const gaps=[];
+      item.dimensions.forEach(d=>{
+        let preferred=null;let labels=[];
+        if(d.name==='外型風格'){preferred=preferences.appearance;labels=p.appearance||[];}
+        if(d.name==='氣質人設'){preferred=preferences.personality;labels=p.personality||[];}
+        if(d.name==='作品類型'){preferred=preferences.genres;labels=p.genres||[];}
+        if(d.name==='表演風格'){preferred=preferences.performance;labels=p.performance||[];}
+        if(d.name==='資歷區間'){preferred=preferences.experience;labels=[p.experience].filter(Boolean);}
+        if(d.name==='觀看情境'){
+          const user=preferences.viewing||{}, person=p.viewing||{};
+          [['平台','platform'],['片長','duration'],['畫質','quality']].forEach(([label,key])=>{if(!user[key]||isNeutral(user[key]))return;(matchSingle(user[key],person[key])===100?matched:gaps).push(`${label}：${user[key]}`);});
+          return;
+        }
+        if(isNeutral(preferred)||!preferred||(Array.isArray(preferred)&&preferred.includes('作品類型不限')))return;
+        const selected=Array.isArray(preferred)?preferred:[preferred];const hits=selected.filter(value=>labels.includes(value));
+        if(hits.length)matched.push(`${d.name}：符合 ${hits.join('、')}`);
+        const missing=selected.filter(value=>!labels.includes(value));if(missing.length)gaps.push(`${d.name}：未匹配 ${missing.join('、')}`);
       });
-    } else {
-      gaps.push(`${dimension.name}：未匹配「${expected.join("、") }」`);
+      return {matched,gaps};
     }
-  });
-  return { matches, gaps };
-}
-
-function createDimensionDetails(item) {
-  const details = element("div", "details");
-  item.dimensions.forEach(dimension => {
-    const detail = element("div", "detail");
-    detail.append(element("strong", "", `${dimension.name}｜${dimension.score} 分`));
-    const bar = element("div", "bar");
-    const fill = element("div", "fill");
-    fill.style.width = `${Math.max(0, Math.min(100, Number(dimension.score) || 0))}%`;
-    bar.append(fill);
-    detail.append(bar);
-    details.append(detail);
-  });
-  return details;
-}
-
-function createReasonSection(title, items, fallback) {
-  const section = element("section", "reason-block");
-  section.append(element("h3", "", title));
-  if (!items.length) {
-    section.append(element("p", "reason-muted", fallback));
-  } else {
-    const list = element("ul");
-    items.forEach(item => list.append(element("li", "", item)));
-    section.append(list);
-  }
-  return section;
-}
-
-function renderComparison(topThree) {
-  const panel = element("section", "panel");
-  panel.append(element("h2", "", "TOP 1–3 六維度比較"));
-  panel.append(element("p", "section-intro", "每列以同一百分比尺度比較候選者各維度的適配分數；此圖僅呈現既有計分結果，不會重新計分。"));
-  const legend = element("div", "legend");
-  topThree.forEach((item, index) => {
-    const entry = element("span", "legend-item");
-    entry.append(element("i", `legend-swatch series-${index}`));
-    entry.append(document.createTextNode(`TOP ${index + 1} ${item.person.name}`));
-    legend.append(entry);
-  });
-  panel.append(legend);
-  const list = element("div", "compare-list");
-  const dimensionNames = ["外型風格", "氣質人設", "作品類型", "表演風格", "資歷區間", "觀看情境"];
-  dimensionNames.forEach(name => {
-    const row = element("section", "compare-row");
-    row.append(element("h3", "", name));
-    const series = element("div", "compare-series");
-    topThree.forEach((item, index) => {
-      const dimension = item.dimensions.find(entry => entry.name === name);
-      const value = dimension && Number.isFinite(Number(dimension.score)) ? Number(dimension.score) : 0;
-      const line = element("div", "compare-item");
-      line.append(element("span", "", `TOP ${index + 1} ${item.person.name}`));
-      const track = element("div", "compare-track");
-      const fill = element("div", `compare-fill series-${index}`);
-      fill.style.width = `${Math.max(0, Math.min(100, value))}%`;
-      track.append(fill);
-      line.append(track, element("span", "compare-value", `${value} 分`));
-      series.append(line);
-    });
-    row.append(series);
-    list.append(row);
-  });
-  panel.append(list);
-  return panel;
-}
-
-function renderFeedback(topThree) {
-  const panel = element("section", "panel");
-  panel.append(element("h2", "", "推薦結果回饋"));
-  panel.append(element("p", "section-intro", "請為本次推薦評分，並選擇最滿意及最不符合期待的維度。回饋僅匿名保存在此瀏覽器，不會傳送至伺服器，也不會改變推薦權重或分數。"));
-  const form = element("form");
-  form.id = "feedbackForm";
-  const grid = element("div", "feedback-grid");
-
-  const ratingWrap = element("div", "feedback-field");
-  const ratingLabel = element("label", "", "整體滿意度（必填）");
-  ratingLabel.htmlFor = "feedbackRating";
-  const rating = element("select");
-  rating.id = "feedbackRating";
-  rating.name = "satisfaction";
-  rating.required = true;
-  rating.append(new Option("請選擇 1–5 分", ""));
-  [1,2,3,4,5].forEach(value => rating.append(new Option(`${value} 分`, String(value))));
-  ratingWrap.append(ratingLabel, rating);
-
-  const dimensions = ["外型風格", "氣質人設", "作品類型", "表演風格", "資歷區間", "觀看情境"];
-  const mostWrap = element("div", "feedback-field");
-  const mostLabel = element("label", "", "最滿意的維度（選填）");
-  mostLabel.htmlFor = "mostSatisfiedDimension";
-  const most = element("select");
-  most.id = "mostSatisfiedDimension";
-  most.name = "mostSatisfiedDimension";
-  most.append(new Option("不指定", ""));
-  dimensions.forEach(value => most.append(new Option(value, value)));
-  mostWrap.append(mostLabel, most);
-
-  const leastWrap = element("div", "feedback-field");
-  const leastLabel = element("label", "", "最不符合期待的維度（選填）");
-  leastLabel.htmlFor = "leastExpectedDimension";
-  const least = element("select");
-  least.id = "leastExpectedDimension";
-  least.name = "leastExpectedDimension";
-  least.append(new Option("不指定", ""));
-  dimensions.forEach(value => least.append(new Option(value, value)));
-  leastWrap.append(leastLabel, least);
-  grid.append(ratingWrap, mostWrap, leastWrap);
-
-  const submit = element("button", "", "儲存本次回饋");
-  submit.type = "submit";
-  const status = element("div", "feedback-status");
-  status.id = "feedbackStatus";
-  status.setAttribute("role", "status");
-  status.setAttribute("aria-live", "polite");
-  form.append(grid, submit, status);
-  panel.append(form);
-
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    status.classList.remove("error");
-    status.style.display = "block";
-    if (!form.reportValidity()) {
-      status.classList.add("error");
-      status.textContent = "請先選擇整體滿意度分數。";
-      return;
+    function renderWorks(card, item) {
+      const block=element('section','reason');block.append(element('h3','','相關作品（資料屬性）'));
+      if(!item.works?.length){block.append(element('p','muted','目前沒有可列出的相關作品資料。'));card.append(block);return;}
+      if(item.sourceStatus==='demo'){block.append(element('p','badge','示範作品資料，非真實作品'));}
+      const list=element('div','works');
+      item.works.slice(0,5).forEach(work=>{const entry=element('div','work');entry.append(element('strong','',work.title||'未提供作品名稱'));const meta=[work.type,work.year].filter(Boolean).join('｜');if(meta)entry.append(element('p','muted',meta));const search=document.createElement('a');search.href=`https://www.youtube.com/results?search_query=${encodeURIComponent(`${item.name} ${work.title||''}`)}`;search.target='_blank';search.rel='noopener noreferrer';search.textContent='在 YouTube 搜尋影片 ↗';entry.append(search);list.append(entry);});
+      block.append(list);card.append(block);
     }
-
-    const record = {
-      submittedAt: new Date().toISOString(),
-      satisfaction: Number(rating.value),
-      mostSatisfiedDimension: most.value || null,
-      leastExpectedDimension: least.value || null
-    };
-    try {
-      const existing = localStorage.getItem(FEEDBACK_KEY);
-      const records = existing === null ? [] : JSON.parse(existing);
-      if (!Array.isArray(records)) throw new Error("Feedback storage must be an array");
-      records.push(record);
-      localStorage.setItem(FEEDBACK_KEY, JSON.stringify(records));
-      status.textContent = `回饋已儲存。此瀏覽器目前保留 ${records.length} 筆匿名回饋；推薦結果未受影響。`;
-      form.reset();
-    } catch (error) {
-      status.classList.add("error");
-      status.textContent = "回饋儲存失敗。現有回饋資料未能讀取或瀏覽器儲存空間不可用；推薦結果不受影響。";
+    function renderSources(card,item) {
+      const evidence=item.evidence||{};const block=element('section','reason');block.append(element('h3','','資料來源與完整度'));
+      const verified=item.sourceStatus==='verified'&&Array.isArray(evidence.sourceUrls)&&evidence.sourceUrls.length>0;
+      block.append(element('p','',verified?'來源狀態：已附公開來源（仍需自行核對）。':'來源狀態：資料不足／示範資料，未驗證為真實公開人物。'));
+      const values=item.dimensions||[];const count=values.filter(d=>Number.isFinite(Number(d.score))).length;block.append(element('p','',`六維度分數欄位完整度：${count}/6。此數值不代表人物事實已獲外部查證。`));
+      if(evidence.verifiedAt)block.append(element('p','',`最後查證時間：${evidence.verifiedAt}`));
+      if(evidence.note)block.append(element('p','muted',evidence.note));
+      const urls=verified?evidence.sourceUrls:[];
+      if(urls.length){const list=element('ul','source-list');urls.forEach(url=>{try{const parsed=new URL(url);if(!['http:','https:'].includes(parsed.protocol))return;const li=element('li');const a=document.createElement('a');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=parsed.href;li.append(a);list.append(li);}catch(error){}});block.append(list);}
+      else block.append(element('p','muted','尚無可展示的已驗證公開來源網址；示範資料不可作為真實人物推薦。'));
+      card.append(block);
     }
-  });
-  return panel;
-}
-
-function renderResults(topThree) {
-  resultsBox.replaceChildren();
-  if (!topThree.length) {
-    showError("目前沒有可供推薦的資料", "候選資料清單是空的，請稍後再試。", "重新填寫問卷");
-    return;
-  }
-
-  resultsBox.append(renderComparison(topThree));
-  topThree.forEach((item, index) => {
-    const person = item.person;
-    const card = element("section", "card");
-    card.append(element("div", "rank", `TOP ${index + 1}`));
-    const personLine = element("div", "person");
-    const identity = element("div");
-    identity.append(element("h2", "", person.name || "候選對象"));
-    identity.append(element("span", "category", person.category || "候選對象"));
-    personLine.append(identity, element("div", "score", `${item.total}%`));
-    card.append(personLine);
-
-    const totalBar = element("div", "bar");
-    const totalFill = element("div", "fill");
-    totalFill.style.width = `${Math.max(0, Math.min(100, Number(item.total) || 0))}%`;
-    totalBar.append(totalFill);
-    card.append(totalBar, createDimensionDetails(item));
-    card.append(element("p", "description", person.description || "暫無詳細介紹。"));
-
-    const reasons = buildReasons(item);
-    card.append(createReasonSection("推薦摘要", [buildRecommendationSummary(item)], "目前沒有足夠資料產生推薦摘要。"));
-    card.append(createReasonSection("主要符合項目", reasons.matches, "本次偏好中沒有可列出的明確符合項目；部分維度可能是不限或尚無匹配標籤。"));
-    card.append(createReasonSection("未符合期待的項目", reasons.gaps, "沒有已選偏好被標記為未符合。"));
-    resultsBox.append(card);
-  });
-  resultsBox.append(renderFeedback(topThree));
-}
-
-editPreferences.addEventListener("click", () => { window.location.href = "survey.html"; });
-
-let preferences = null;
-let storageError = false;
-try {
-  // Keep the existing preference key read-only; feedback is stored separately.
-  const storedPreferences = localStorage.getItem("matchlens_preferences");
-  if (storedPreferences !== null) preferences = JSON.parse(storedPreferences);
-} catch (error) {
-  storageError = true;
-}
-
-if (storageError) {
-  summaryText.textContent = "無法讀取瀏覽器中的問卷資料。請確認本機儲存空間可用，再重新填寫問卷。";
-  showError("問卷資料無法讀取", "儲存資料格式錯誤，或瀏覽器不允許存取本機儲存空間。", "重新填寫問卷");
-} else if (!preferences) {
-  summaryText.textContent = "尚未找到問卷資料。";
-  showError("尚未找到問卷資料", "請先完成偏好問卷，再查看推薦結果。", "前往填寫問卷");
-} else if (typeof candidates === "undefined" || !Array.isArray(candidates)) {
-  summaryText.textContent = "候選資料無法載入。";
-  showError("候選資料讀取失敗", "請確認 data.js 已建立並正確載入。");
-} else {
-  // Existing dimension scoring, weighting, total-score calculation and ranking are retained.
-  const weights = getWeights(preferences);
-  const ranked = candidates.map(person => {
-    const dimensions = getDimensionScores(preferences, person);
-    const total = dimensions.reduce((sum, item, index) => sum + item.score * weights[index] / 100, 0);
-    return { person, dimensions, total: Math.round(total * 10) / 10 };
-  }).sort((a, b) => b.total - a.total);
-
-  summaryText.textContent = `本次分析共比較 ${candidates.length} 位候選對象，依照你設定的六項原始重要度重新正規化權重計算適配分數，並依總分排序。`;
-  renderResults(ranked.slice(0, 3));
-}
-</script>
+    function renderResults(ranking, preferences, response) {
+      if(!Array.isArray(ranking)||ranking.length===0){showError('沒有推薦結果','本次沒有可用候選資料。你可以重新填寫問卷，稍後再試。');return;}
+      resultsBox.replaceChildren(renderComparison(ranking));
+      ranking.forEach((item,index)=>{
+        const card=element('section','card');card.append(element('div','rank',`TOP ${index+1}`));
+        const person=element('div','person');const identity=element('div');identity.append(element('h2','',item.name||'候選人物'),element('div','muted',item.category||'人物類別未提供'));person.append(identity,element('div','score',`${Number(item.score)||0}%`));card.append(person,scoreBar(item.score));
+        const dims=element('div','details');(item.dimensions||[]).forEach(d=>{const detail=element('div','detail');detail.append(element('strong','',`${d.name}｜${Number(d.score)||0} 分`),scoreBar(d.score));dims.append(detail);});card.append(dims);
+        if(item.description)card.append(element('p','muted item-description',item.description));
+        const reasons=matchingReasons(item,preferences);const block=element('section','reason');block.append(element('h3','','推薦原因（依問卷標籤比對）'));
+        const aiText=response?.recommendationReason;block.append(element('p','',aiText||`總適配度 ${item.score}%；${(item.bestMatches||[]).length?`符合維度：${item.bestMatches.join('、')}。`:'依目前示範標籤，沒有明確完全符合維度。'}`));
+        if(response?.geminiEnabled)block.append(element('p','muted','Gemini 提供文字補充；分數與排名仍由原有規則式計分產生。'));
+        if(reasons.matched.length){block.append(element('h3','','符合偏好'));const ul=element('ul');reasons.matched.forEach(x=>ul.append(element('li','',x)));block.append(ul);}
+        if(reasons.gaps.length){block.append(element('h3','','未符合／資料不足'));const ul=element('ul');reasons.gaps.forEach(x=>ul.append(element('li','',x)));block.append(ul);}
+        card.append(block);
+        if(response?.dataLimit)card.append(element('p','muted',response.dataLimit));
+        renderWorks(card,item);renderSources(card,item);resultsBox.append(card);
+      });
+      resultsBox.append(renderFeedback());
+    }
+    function renderFeedback() {
+      const panel=element('section','panel');panel.append(element('h2','','推薦結果回饋'),element('p','section-intro','回饋只保存在此瀏覽器，不會傳送至伺服器。'));
+      const form=document.createElement('form');const grid=element('div','feedback-grid');
+      const addSelect=(labelText,name,options,required=false)=>{const wrap=element('div','feedback-field');const label=element('label','',labelText);const select=document.createElement('select');select.name=name;select.required=required;options.forEach(([text,value])=>{const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);});wrap.append(label,select);grid.append(wrap);return select;};
+      const rating=addSelect('整體滿意度（必填）','satisfaction',[['請選擇 1–5 分',''],...['1','2','3','4','5'].map(x=>[`${x} 分`,x])],true);
+      const most=addSelect('最滿意的維度（選填）','mostSatisfiedDimension',[['不指定',''],...DIMENSIONS.map(x=>[x,x])]);
+      const least=addSelect('最不符合期待的維度（選填）','leastExpectedDimension',[['不指定',''],...DIMENSIONS.map(x=>[x,x])]);
+      const submit=element('button','button','儲存本次回饋');submit.type='submit';const status=element('p','feedback-status','');status.setAttribute('role','status');form.append(grid,submit,status);form.addEventListener('submit',event=>{event.preventDefault();if(!form.reportValidity())return;try{const current=JSON.parse(localStorage.getItem(FEEDBACK_KEY)||'[]');if(!Array.isArray(current))throw new Error('Invalid feedback storage');current.push({submittedAt:new Date().toISOString(),satisfaction:Number(rating.value),mostSatisfiedDimension:most.value||null,leastExpectedDimension:least.value||null});localStorage.setItem(FEEDBACK_KEY,JSON.stringify(current));status.textContent=`回饋已儲存；本瀏覽器目前保留 ${current.length} 筆。`;form.reset();}catch(error){status.textContent='回饋儲存失敗，請檢查瀏覽器本機儲存空間。';}});panel.append(form);return panel;
+    }
+    document.getElementById('editPreferences').addEventListener('click',()=>{window.location.href='survey.html';});
+    async function init() {
+      let preferences;
+      try{const raw=localStorage.getItem(PREFERENCE_KEY);if(raw)preferences=JSON.parse(raw);}catch(error){statusBox.className='status error';statusBox.textContent='無法讀取本機問卷資料。請重新填寫問卷。';showError('問卷資料無法讀取','瀏覽器儲存資料格式錯誤或無法使用。');return;}
+      if(!preferences){summaryText.textContent='尚未找到問卷資料。';statusBox.hidden=true;showError('尚未找到問卷資料','請先完成偏好問卷，再查看推薦結果。');return;}
+      if(typeof candidates==='undefined'||!Array.isArray(candidates)){statusBox.className='status error';statusBox.textContent='候選資料檔未能載入。';showError('候選資料讀取失敗','請確認 data.js 已載入。');return;}
+      let ranking=localRanking(preferences);let response=null;let timer;
+      try{
+        const controller=new AbortController();timer=setTimeout(()=>controller.abort(),12000);
+        const result=await fetch('/api/recommendations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(preferences),signal:controller.signal});
+        if(!result.ok)throw new Error(`推薦服務回應 ${result.status}`);
+        response=await result.json();
+        if(!response.ok||!Array.isArray(response.ranking))throw new Error('推薦服務回傳格式不正確');
+        const byId=new Map(candidates.map(person=>[person.id,person]));
+        ranking=response.ranking.map(item=>({...item,person:byId.get(item.personId)||{},sourceStatus:item.sourceStatus||'demo'}));
+        statusBox.className='status';statusBox.textContent=response.geminiEnabled?'已收到伺服器推薦結果；Gemini 已補充文字說明，計分仍使用原有規則。':'已收到伺服器推薦結果；目前使用本地規則式文字說明。';
+        summaryText.textContent=response.summary||`本次分析比較 ${candidates.length} 位候選資料，依六項原始重要度正規化權重計分並排序。`;
+      }catch(error){
+        const reason=error.name==='AbortError'?'推薦服務逾時（12 秒），已使用本地規則式結果。':`無法連接推薦服務（${error.message}），已使用本地規則式結果。`;
+        statusBox.className='status';statusBox.textContent=reason;
+        summaryText.textContent=`本次分析比較 ${candidates.length} 位候選資料，依六項原始重要度正規化權重計分並排序。伺服器不可用時已安全回退。`;
+      }finally{clearTimeout(timer);}
+      renderResults(ranking,preferences,response);
+    }
+    init();
+  })();
+  </script>
 </body>
 </html>
