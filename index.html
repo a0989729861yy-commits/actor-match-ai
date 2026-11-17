@@ -4,11 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#101525" />
-    <meta
-      name="description"
-      content="MatchLens 受問者適配分析：透過六維度偏好與加權模型，產生個人化演員推薦。"
-    />
-    <title>MatchLens｜受問者適配分析</title>
+    <meta name="description" content="Gemini AI 適配分析：以六維度偏好、Google 搜尋來源與加權比對整理人物推薦。" />
+    <title>Gemini AI 適配分析｜MatchLens</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="app.js" defer></script>
   </head>
@@ -16,142 +13,54 @@
     <header class="topbar">
       <a class="brand" href="index.html" aria-label="MatchLens 首頁">Match<span>Lens</span></a>
       <nav class="nav" aria-label="主導覽">
-        <a href="#overview">專題概覽</a>
+        <a href="#overview">功能說明</a>
         <a href="#dimensions">六維度</a>
         <a href="#process">分析流程</a>
         <a href="survey.html">開始分析</a>
       </nav>
     </header>
-
     <main>
       <section class="hero">
-        <div class="badge">六維度適配分析｜個人化推薦</div>
-        <h1>找到符合你偏好的<br /><span>候選演員</span></h1>
-        <p>
-          透過匿名偏好問卷，依外型風格、氣質人設、作品類型、表演風格、資歷區間與觀看情境進行加權比對，
-          看見清楚、可理解的適配結果。
-        </p>
+        <div class="badge">Gemini AI 適配分析｜來源透明</div>
+        <h1>用六維度偏好<br /><span>探索適合你的演員</span></h1>
+        <p>完成匿名問卷後，Gemini 會理解偏好並透過 Google Search 搜尋公開人物資料，再依六維度與你設定的權重計算適配分數。只有取得可核對搜尋來源的結果才會呈現；AI 整理內容不等於人工查證。</p>
         <div class="hero-actions">
-          <a class="primary-btn" href="survey.html">開始偏好分析 <span aria-hidden="true">→</span></a>
-          <a class="secondary-btn" href="#dimensions">探索六維度</a>
+          <a class="primary-btn" href="survey.html">開始 Gemini AI 適配分析 <span aria-hidden="true">→</span></a>
+          <a class="secondary-btn" href="#dimensions">了解六維度</a>
         </div>
       </section>
-
       <section id="overview" class="section intro-section">
-        <p class="section-tag">專題概覽</p>
-        <h2>把個人偏好，轉化為可解釋的適配分析</h2>
-        <p class="section-copy">
-          本專題是「生成式 AI 思維第五組」的課程作品。系統根據使用者問卷與候選資料標籤，
-          以六維度相似度乘上各維度權重計算適配分數，並依分數排序。推薦依據來自明確的規則式比較，
-          不會假稱使用未實際部署的 AI 模型。
-        </p>
+        <p class="section-tag">功能說明</p>
+        <h2>從偏好到有來源的適配結果</h2>
+        <p class="section-copy">問卷答案與原始權重保存在瀏覽器；提交分析時才送至本服務端點。Gemini 與 Google Search 提供搜尋整理，適配分數仍使用原有六維度規則及權重計算。結果來源是搜尋 grounding 來源，不代表人工獨立查證。</p>
       </section>
-
       <section id="dimensions" class="section dimension-section">
         <p class="section-tag">六大分析維度</p>
-        <h2>依照既定研究架構，逐項建立偏好模型</h2>
-        <p class="section-copy">
-          六個維度共同構成分析模型；你可以設定各項重要程度，系統會將權重正規化為 100%。
-        </p>
+        <h2>依照你的偏好與重要程度計算適配</h2>
+        <p class="section-copy">六個維度的分數依既有標籤比對規則產生；問卷權重正規化後合計 100%。</p>
         <div class="dimension-grid">
-          <article class="dim-card">
-            <div class="dim-number">01 / APPEARANCE</div>
-            <h3>外型風格</h3>
-            <p>比較整體形象與風格走向的偏好標籤。</p>
-          </article>
-          <article class="dim-card">
-            <div class="dim-number">02 / PERSONALITY</div>
-            <h3>氣質人設</h3>
-            <p>依公開形象描述，比較清新、成熟、活潑等氣質偏好。</p>
-          </article>
-          <article class="dim-card">
-            <div class="dim-number">03 / GENRE</div>
-            <h3>作品類型</h3>
-            <p>比較喜愛的劇情題材與敘事類型，可複選或選擇不限。</p>
-          </article>
-          <article class="dim-card">
-            <div class="dim-number">04 / PERFORMANCE</div>
-            <h3>表演風格</h3>
-            <p>依候選資料中的表演風格標籤，比對你的演出偏好。</p>
-          </article>
-          <article class="dim-card">
-            <div class="dim-number">05 / EXPERIENCE</div>
-            <h3>資歷區間</h3>
-            <p>依目前示範資料所標記的發展階段進行比較。</p>
-          </article>
-          <article class="dim-card">
-            <div class="dim-number">06 / VIEWING</div>
-            <h3>觀看情境</h3>
-            <p>分別比較平台、片長與畫質偏好。</p>
-          </article>
+          <article class="dim-card"><div class="dim-number">01 / APPEARANCE</div><h3>外型風格</h3><p>比對來源資料支持的外型風格標籤。</p></article>
+          <article class="dim-card"><div class="dim-number">02 / PERSONALITY</div><h3>氣質人設</h3><p>比對公開人物形象相關標籤。</p></article>
+          <article class="dim-card"><div class="dim-number">03 / GENRE</div><h3>作品類型</h3><p>依公開作品題材比對，可複選或選擇不限。</p></article>
+          <article class="dim-card"><div class="dim-number">04 / PERFORMANCE</div><h3>表演風格</h3><p>整理來源資料支持的表演風格特徵。</p></article>
+          <article class="dim-card"><div class="dim-number">05 / EXPERIENCE</div><h3>資歷區間</h3><p>僅在搜尋資料支持時整理人物發展階段。</p></article>
+          <article class="dim-card"><div class="dim-number">06 / VIEWING</div><h3>觀看情境</h3><p>比對平台、片長與畫質偏好；無來源資料不推斷。</p></article>
         </div>
       </section>
-
       <section id="process" class="section process-section">
-        <p class="section-tag">分析流程</p>
-        <h2>從填答到推薦，步驟清楚透明</h2>
-        <p class="section-copy">結果由固定資料標籤與計分規則產生，輸入相同時可重現相同排序。</p>
+        <p class="section-tag">分析流程</p><h2>問卷、搜尋、計分，步驟清楚</h2>
+        <p class="section-copy">服務未啟用、搜尋失敗或結果無可核對來源時，系統會顯示錯誤，不會以預設人物替代。</p>
         <div class="process-grid">
-          <article class="process-card">
-            <div class="step-index">STEP 01</div>
-            <strong>填寫偏好</strong>
-            <p>依序完成六個維度並設定相對重要程度。</p>
-          </article>
-          <article class="process-card">
-            <div class="step-index">STEP 02</div>
-            <strong>比對標籤</strong>
-            <p>將偏好與結構化候選資料中的標籤逐項比較。</p>
-          </article>
-          <article class="process-card">
-            <div class="step-index">STEP 03</div>
-            <strong>加權計分</strong>
-            <p>以維度相似度和正規化權重計算適配分數。</p>
-          </article>
-          <article class="process-card">
-            <div class="step-index">STEP 04</div>
-            <strong>查看結果</strong>
-            <p>依總分排序，查看推薦候選與維度比較。</p>
-          </article>
+          <article class="process-card"><div class="step-index">STEP 01</div><strong>完成問卷</strong><p>設定六維度偏好與各維度相對權重。</p></article>
+          <article class="process-card"><div class="step-index">STEP 02</div><strong>理解偏好與搜尋</strong><p>Gemini 整理搜尋意圖，並透過 Google Search 工具搜尋公開資料。</p></article>
+          <article class="process-card"><div class="step-index">STEP 03</div><strong>整理與加權計分</strong><p>只採用帶有 grounding 來源的資料；維持原有六維度計分規則。</p></article>
+          <article class="process-card"><div class="step-index">STEP 04</div><strong>查看來源與結果</strong><p>呈現適配分析、相關作品、來源網址及查證限制。</p></article>
         </div>
       </section>
-
-      <section class="section summary-section">
-        <div class="summary-panel">
-          <p class="section-tag">計算原理</p>
-          <h2>六維度相似度 × 各維度權重，加總為總適配分數</h2>
-          <p>
-            權重反映你對各維度的相對重視程度，正規化後總和為 100%。目前候選人為虛構示範資料，
-            分數只代表偏好標籤與示範標籤的吻合程度，不代表客觀能力、作品品質或真實人物評價。
-          </p>
-        </div>
-      </section>
-
-      <section class="section cta-section">
-        <div class="cta-box">
-          <div>
-            <p class="section-tag">立即開始</p>
-            <h2>建立你的六維度偏好模型</h2>
-            <p class="section-copy">匿名填答，不需要提供姓名、電話等個人識別資料。</p>
-          </div>
-          <a class="primary-btn" href="survey.html">前往偏好問卷 <span aria-hidden="true">→</span></a>
-        </div>
-      </section>
-
-      <aside class="section" aria-labelledby="ethics-title">
-        <div class="summary-panel">
-          <p class="section-tag">資料倫理</p>
-          <h2 id="ethics-title">匿名、示範資料與本機儲存</h2>
-          <p>
-            本專題僅供成年使用者使用。問卷答案保存在目前瀏覽器的本機儲存空間，不會送至伺服器。
-            候選資料是明確標示的虛構示範資料，並非真實人物資料；網站不提供露骨內容或相關影像。
-          </p>
-        </div>
-      </aside>
+      <section class="section summary-section"><div class="summary-panel"><p class="section-tag">計算與查證</p><h2>六維度分數 × 個人權重</h2><p>適配分數由程式依原有規則計算，不由 Gemini 生成。人物描述和特徵標籤是 AI 整理內容；來源網址來自本次 Google Search grounding，網站不宣稱已人工核實來源內容。沒有合格來源時不會輸出推薦。</p></div></section>
+      <section class="section cta-section"><div class="cta-box"><div><p class="section-tag">立即開始</p><h2>建立你的六維度偏好模型</h2><p class="section-copy">匿名填答，不需要提供姓名、電話等個人識別資料。</p></div><a class="primary-btn" href="survey.html">前往偏好問卷 <span aria-hidden="true">→</span></a></div></section>
+      <aside class="section" aria-labelledby="ethics-title"><div class="summary-panel"><p class="section-tag">資料倫理</p><h2 id="ethics-title">匿名填答，來源透明呈現</h2><p>問卷答案先保存在目前瀏覽器；進行分析時會傳送至伺服器端 Gemini API。API Key 僅由伺服器環境變數提供，不放在前端。AI 整理的資訊不是人工查證結論，請開啟結果來源自行核對。</p></div></aside>
     </main>
-
-    <footer class="footer">
-      <p>生成式 AI 思維第五組｜受問者適配分析｜MatchLens</p>
-      <p class="footnote">課程示範作品｜規則式適配分析，非生成式 AI 模型結果</p>
-    </footer>
+    <footer class="footer"><p>生成式 AI 思維第五組｜Gemini AI 適配分析｜MatchLens</p><p class="footnote">六維度分數依規則計算；人物資料為 AI 搜尋整理，來源狀態請自行核對。</p></footer>
   </body>
 </html>
