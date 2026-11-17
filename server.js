@@ -11,8 +11,10 @@ const PREFERRED_MODEL = 'gemini-3.8-flash';
 const API_ROOT = 'https://generativelanguage.googleapis.com/v1beta';
 const DIMENSIONS = ['外型風格', '氣質人設', '作品類型', '表演風格', '資歷區間', '觀看情境'];
 const NEUTRAL_VALUES = new Set(['沒有特別偏好', '沒有特別要求', '皆可', '無限制', '不拘', '不限資歷', '不限平台', '不限片長', '作品類型不限']);
-// Stable model IDs documented for Search grounding; models.list still verifies account access and generateContent support.
 const STABLE_SEARCH_MODELS = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
+const RESULT_SOURCE_STATUS = 'google-search-grounded-not-independently-verified';
+const IN_FLIGHT = new Map();
+const MAX_IN_FLIGHT = 20;
 const LABELS = {
   appearance: ['清新自然', '成熟穩重', '陽光活潑', '優雅知性', '個性時尚'],
   personality: ['溫柔親切', '幽默風趣', '自信獨立', '沉穩內斂', '熱情活潑'],
@@ -23,42 +25,48 @@ const LABELS = {
   duration: ['30 分鐘以內', '30～60 分鐘', '60～120 分鐘', '120 分鐘以上'],
   quality: ['一般畫質即可', 'Full HD', '4K 高畫質']
 };
-const IN_FLIGHT = new Map();
-const RESULT_SOURCE_STATUS = 'google-search-grounded-not-independently-verified';
 
 function isNeutral(value) { return typeof value === 'string' && NEUTRAL_VALUES.has(value); }
 function matchSingle(preference, options) {
   if (isNeutral(preference)) return 100;
-  if (preference === undefined || preference === null || preference === '') return 0;
-  return (Array.isArray(options) ? options : [options]).includes(preference) ? 100 : 0;
+  if (preference === undefined || preference === null || preference === '') return null;
+  const labels = Array.isArray(options) ? options : [options];
+  if (!labels.length) return null;
+  return labels.includes(preference) ? 100 : 0;
 }
 function matchMultiple(selected, options) {
-  if (!Array.isArray(selected) || selected.length === 0) return 0;
+  if (!Array.isArray(selected) || selected.length === 0) return null;
   if (selected.includes('作品類型不限')) return 100;
   const labels = Array.isArray(options) ? options : [];
+  if (!labels.length) return null;
   return Math.round(selected.filter(item => labels.includes(item)).length / selected.length * 100);
 }
 function getWeights(preferences) {
   const saved = Array.isArray(preferences.weights) ? preferences.weights : [];
   const items = DIMENSIONS.map((name, index) => saved.find(item => item && item.name === name) || saved[index]);
-  const rawScores = items.map(item => Number(item?.score));
-  const hasValidRawScores = rawScores.every(value => Number.isFinite(value) && value > 0);
-  const values = hasValidRawScores ? rawScores : items.map(item => Number(item?.percentage));
+  const scores = items.map(item => Number(item?.score));
+  const validScores = scores.every(value => Number.isFinite(value) && value >= 0);
+  const values = validScores ? scores : items.map(item => Number(item?.percentage));
   const total = values.reduce((sum, value) => sum + value, 0);
-  if (!values.every(value => Number.isFinite(value) && value >= 0) || total <= 0) return DIMENSIONS.map(() => 100 / 6);
+  if (!values.every(value => Number.isFinite(value) && value >= 0) || total <= 0) return DIMENSIONS.map(() => 100 / DIMENSIONS.length);
   return values.map(value => value / total * 100);
 }
 function getDimensionScores(preferences, person) {
-  const viewing = preferences.viewing || {};
-  const personViewing = person.viewing || {};
-  const viewingScore = (matchSingle(viewing.platform, personViewing.platform) + matchSingle(viewing.duration, personViewing.duration) + matchSingle(viewing.quality, personViewing.quality)) / 3;
+  const viewingPreference = preferences.viewing || {};
+  const viewingData = person.viewing || {};
+  const viewingParts = [
+    matchSingle(viewingPreference.platform, viewingData.platform),
+    matchSingle(viewingPreference.duration, viewingData.duration),
+    matchSingle(viewingPreference.quality, viewingData.quality)
+  ].filter(score => score !== null);
+  const viewingScore = viewingParts.length ? Math.round(viewingParts.reduce((sum, score) => sum + score, 0) / viewingParts.length) : null;
   return [
     { name: DIMENSIONS[0], score: matchSingle(preferences.appearance, person.appearance) },
     { name: DIMENSIONS[1], score: matchSingle(preferences.personality, person.personality) },
     { name: DIMENSIONS[2], score: matchMultiple(preferences.genres, person.genres) },
     { name: DIMENSIONS[3], score: matchSingle(preferences.performance, person.performance) },
     { name: DIMENSIONS[4], score: matchSingle(preferences.experience, person.experience) },
-    { name: DIMENSIONS[5], score: Math.round(viewingScore) }
+    { name: DIMENSIONS[5], score: viewingScore }
   ];
 }
 function fail(code, message, status = 502) { const error = new Error(message); error.code = code; error.status = status; return error; }
@@ -78,15 +86,23 @@ async function geminiFetch(url, options, timeoutMs = 45000) {
   } finally { clearTimeout(timer); }
 }
 async function listAvailableModels() {
-  const response = await geminiFetch(`${API_ROOT}/models?pageSize=100`, { headers: { 'x-goog-api-key': GEMINI_API_KEY } });
-  if (!response.ok) {
-    if (response.status === 401 || response.status === 403) throw fail('API_KEY_INVALID_OR_FORBIDDEN', 'Gemini API Key 無效或帳戶沒有 API 使用權限。', 503);
-    if (response.status === 429) throw fail('API_QUOTA_OR_PERMISSION', 'Gemini API 額度或使用權限不足。', 429);
-    throw fail('MODEL_LIST_FAILED', `Gemini models.list 失敗（HTTP ${response.status}），無法確認可用模型。`, 502);
-  }
-  let body; try { body = await response.json(); } catch { throw fail('INVALID_GEMINI_RESPONSE', 'Gemini models.list 回傳格式無效。'); }
-  if (!Array.isArray(body.models)) throw fail('INVALID_GEMINI_RESPONSE', 'Gemini models.list 未回傳 models 陣列。');
-  return body.models;
+  const models = [];
+  let pageToken = '';
+  do {
+    const query = new URLSearchParams({ pageSize: '100' });
+    if (pageToken) query.set('pageToken', pageToken);
+    const response = await geminiFetch(`${API_ROOT}/models?${query}`, { headers: { 'x-goog-api-key': GEMINI_API_KEY } });
+    if (!response.ok) {
+      if ([401, 403].includes(response.status)) throw fail('API_KEY_INVALID_OR_FORBIDDEN', 'Gemini API Key 無效或帳戶沒有 API 使用權限。', 503);
+      if (response.status === 429) throw fail('API_QUOTA_OR_PERMISSION', 'Gemini API 額度或使用權限不足。', 429);
+      throw fail('MODEL_LIST_FAILED', `Gemini models.list 失敗（HTTP ${response.status}），無法確認可用模型。`, 502);
+    }
+    let body; try { body = await response.json(); } catch { throw fail('INVALID_GEMINI_RESPONSE', 'Gemini models.list 回傳格式無效。'); }
+    if (!Array.isArray(body.models)) throw fail('INVALID_GEMINI_RESPONSE', 'Gemini models.list 未回傳 models 陣列。');
+    models.push(...body.models);
+    pageToken = typeof body.nextPageToken === 'string' ? body.nextPageToken : '';
+  } while (pageToken && models.length < 500);
+  return models;
 }
 function chooseModel(models) {
   const byName = new Map(models.map(model => [String(model.name || '').replace(/^models\//, ''), model]));
@@ -104,7 +120,7 @@ async function generate(model, prompt, useSearch = false) {
   });
   if (!response.ok) {
     let detail = ''; try { detail = (await response.json())?.error?.message || ''; } catch {}
-    if (response.status === 401 || response.status === 403) throw fail('API_KEY_INVALID_OR_FORBIDDEN', 'Gemini API Key 無效或帳戶沒有 API 使用權限。', 503);
+    if ([401, 403].includes(response.status)) throw fail('API_KEY_INVALID_OR_FORBIDDEN', 'Gemini API Key 無效或帳戶沒有 API 使用權限。', 503);
     if (response.status === 429) throw fail('API_QUOTA_OR_PERMISSION', 'Gemini API 額度或使用權限不足。', 429);
     if ([400, 404].includes(response.status)) throw fail(useSearch ? 'GROUNDING_UNAVAILABLE' : 'MODEL_UNAVAILABLE', useSearch ? `模型或帳戶不支援 Google Search Grounding：${detail || '請確認模型及帳戶資格'}。` : `Gemini 模型不可用：${detail || '請確認模型 ID'}。`, 503);
     throw fail('GEMINI_REQUEST_FAILED', `Gemini generateContent 失敗（HTTP ${response.status}）；未產生推薦。`, 502);
@@ -118,9 +134,11 @@ function groundingEvidence(data) {
   const metadata = data?.candidates?.[0]?.groundingMetadata;
   if (!metadata || !Array.isArray(metadata.groundingChunks) || !Array.isArray(metadata.groundingSupports)) return { urls: [], supports: [], chunks: [] };
   const chunks = metadata.groundingChunks;
-  const urls = chunks.map(chunk => validHttpUrl(chunk?.web?.uri)).filter(Boolean);
-  const supports = metadata.groundingSupports.filter(item => typeof item?.segment?.text === 'string' && Array.isArray(item.groundingChunkIndices));
-  return { urls: [...new Set(urls)], supports, chunks };
+  return {
+    urls: [...new Set(chunks.map(chunk => validHttpUrl(chunk?.web?.uri)).filter(Boolean))],
+    supports: metadata.groundingSupports.filter(item => typeof item?.segment?.text === 'string' && Array.isArray(item.groundingChunkIndices)),
+    chunks
+  };
 }
 function citedUrlsForText(evidence, text) {
   const query = String(text || '').trim().toLocaleLowerCase();
@@ -168,13 +186,31 @@ function validateCandidates(result, evidence) {
   }
   return people;
 }
+function isSkipped(preferences, name) { return Array.isArray(preferences.skippedDimensions) && preferences.skippedDimensions.includes(name); }
 function buildRanking(preferences, people) {
   const weights = getWeights(preferences);
   return people.map(person => {
-    const dimensions = getDimensionScores(preferences, person);
-    const score = Math.round(dimensions.reduce((sum, item, index) => sum + item.score * weights[index] / 100, 0) * 10) / 10;
-    return { rank: 0, name: person.name, category: person.category, score, description: person.description, dimensions, works: person.works, evidence: person.evidence, bestMatches: dimensions.filter(item => item.score >= 80).map(item => item.name), gaps: dimensions.filter(item => item.score < 50).map(item => item.name) };
-  }).sort((a, b) => b.score - a.score).map((person, index) => ({ ...person, rank: index + 1 }));
+    const dimensions = getDimensionScores(preferences, person).map(item => ({
+      ...item,
+      skipped: isSkipped(preferences, item.name),
+      status: isSkipped(preferences, item.name) ? 'skipped' : item.score === null ? 'unknown' : 'scored'
+    }));
+    const comparable = dimensions.map((item, index) => ({ ...item, weight: weights[index] }))
+      .filter(item => !item.skipped && item.score !== null && item.weight > 0);
+    const weightTotal = comparable.reduce((sum, item) => sum + item.weight, 0);
+    const score = weightTotal > 0 ? Math.round(comparable.reduce((sum, item) => sum + item.score * item.weight, 0) / weightTotal * 10) / 10 : null;
+    return {
+      rank: 0, name: person.name, category: person.category, score,
+      description: person.description, dimensions, works: person.works, evidence: person.evidence,
+      dataCompleteness: `${comparable.length}/6`,
+      bestMatches: comparable.filter(item => item.score >= 80).map(item => item.name),
+      gaps: comparable.filter(item => item.score < 50).map(item => item.name),
+      unknownDimensions: dimensions.filter(item => item.status === 'unknown').map(item => item.name),
+      weightsUsed: comparable.reduce((sum, item) => sum + item.weight, 0)
+    };
+  }).filter(person => Number.isFinite(person.score) && person.dataCompleteness !== '0/6')
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'zh-Hant'))
+    .map((person, index) => ({ ...person, rank: index + 1 }));
 }
 function validatePreferences(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
@@ -184,15 +220,20 @@ function validatePreferences(value) {
   if (value.genres.includes('作品類型不限') && value.genres.length !== 1) return false;
   if (!LABELS.performance.includes(value.performance) && !isNeutral(value.performance)) return false;
   if (!LABELS.experience.includes(value.experience) && value.experience !== '不限資歷') return false;
-  if (!value.viewing || typeof value.viewing !== 'object') return false;
+  if (!value.viewing || typeof value.viewing !== 'object' || Array.isArray(value.viewing)) return false;
   if (!LABELS.platform.includes(value.viewing.platform) && value.viewing.platform !== '不限平台') return false;
   if (!LABELS.duration.includes(value.viewing.duration) && value.viewing.duration !== '不限片長') return false;
   if (!LABELS.quality.includes(value.viewing.quality) && !isNeutral(value.viewing.quality)) return false;
-  if (value.weights !== undefined) {
-    if (!Array.isArray(value.weights) || value.weights.length !== 6) return false;
-    const names = value.weights.map(item => item?.name);
-    if (new Set(names).size !== 6 || DIMENSIONS.some(name => !names.includes(name))) return false;
-    if (value.weights.some(item => !Number.isFinite(Number(item.score)) || Number(item.score) < 1 || Number(item.score) > 5)) return false;
+  const skipped = value.skippedDimensions === undefined ? [] : value.skippedDimensions;
+  if (!Array.isArray(skipped) || skipped.some(name => !DIMENSIONS.includes(name)) || new Set(skipped).size !== skipped.length) return false;
+  if (skipped.length === DIMENSIONS.length) return false;
+  if (!Array.isArray(value.weights) || value.weights.length !== DIMENSIONS.length) return false;
+  const weightItems = DIMENSIONS.map(name => value.weights.find(item => item?.name === name));
+  if (weightItems.some(item => !item || !Number.isFinite(Number(item.score)) || Number(item.score) < 0 || Number(item.score) > 5)) return false;
+  for (let index = 0; index < DIMENSIONS.length; index += 1) {
+    const shouldSkip = skipped.includes(DIMENSIONS[index]);
+    if (shouldSkip !== (Number(weightItems[index].score) === 0)) return false;
+    if (!Number.isFinite(Number(weightItems[index].percentage)) || Number(weightItems[index].percentage) < 0) return false;
   }
   return true;
 }
@@ -211,19 +252,20 @@ async function analyze(preferences) {
   const people = validateCandidates(result, evidence);
   if (!people.length) throw fail('GROUNDING_VALIDATION_FAILED', '目前無法取得與候選人姓名有關聯的可靠來源，暫時無法產生推薦結果。', 404);
   const ranking = buildRanking(preferences, people);
-  if (!ranking.length || ranking.some(person => person.dimensions.length !== 6 || !Number.isFinite(person.score) || !person.evidence.sourceUrls.length)) throw fail('RESULT_VALIDATION_FAILED', '六維度計分或來源驗證失敗，未產生推薦。');
+  if (!ranking.length || ranking.some(person => person.dimensions.length !== 6 || (person.score !== null && !Number.isFinite(person.score)) || !person.evidence.sourceUrls.length)) throw fail('RESULT_VALIDATION_FAILED', '六維度計分或來源驗證失敗，未產生推薦。');
   return { model, summary: result.summary.slice(0, 700), preferenceSummary: understanding.preferenceSummary.slice(0, 500), recommendationReason: result.recommendationReason.slice(0, 1000), ranking };
 }
 
 app.use(express.json({ limit: '1mb' }));
 app.get('/api/health', (req, res) => res.json({ ok: true, geminiConfigured: Boolean(GEMINI_API_KEY), preferredModel: PREFERRED_MODEL, searchTool: 'google_search', status: GEMINI_API_KEY ? 'configured' : 'not_configured' }));
 app.post('/api/recommendations', async (req, res) => {
-  if (!validatePreferences(req.body)) return res.status(400).json({ success: false, error: 'INVALID_PREFERENCES', message: '請提供完整且有效的六維度問卷資料。' });
+  if (!validatePreferences(req.body)) return res.status(400).json({ success: false, ok: false, error: 'INVALID_PREFERENCES', message: '請提供完整且有效的六維度問卷資料。' });
   const requestKey = JSON.stringify(req.body);
   if (IN_FLIGHT.has(requestKey)) {
     try { return res.json(await IN_FLIGHT.get(requestKey)); }
-    catch (error) { return res.status(error.status || 502).json({ success: false, error: error.code || 'ANALYSIS_FAILED', message: error.message }); }
+    catch (error) { return res.status(error.status || 502).json({ success: false, ok: false, error: error.code || 'ANALYSIS_FAILED', message: error.message }); }
   }
+  if (IN_FLIGHT.size >= MAX_IN_FLIGHT) return res.status(503).json({ success: false, ok: false, error: 'SERVICE_BUSY', message: '目前分析請求較多，請稍後重試。' });
   const task = analyze(req.body).then(result => ({ success: true, ok: true, geminiEnabled: true, searchPerformed: true, model: result.model, sourceStatus: RESULT_SOURCE_STATUS, summary: result.summary, preferenceSummary: result.preferenceSummary, recommendationReason: result.recommendationReason, ranking: result.ranking })).finally(() => IN_FLIGHT.delete(requestKey));
   IN_FLIGHT.set(requestKey, task);
   try { return res.json(await task); }
@@ -231,10 +273,8 @@ app.post('/api/recommendations', async (req, res) => {
 });
 app.use(express.static(path.join(__dirname, '.')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-
 if (require.main === module) app.listen(PORT, () => {
   console.log(`[MatchLens] Server running at http://localhost:${PORT}`);
   if (!GEMINI_API_KEY) console.log('[MatchLens] Gemini API is not enabled. Set GEMINI_API_KEY in the server environment.');
 });
-
 module.exports = { app, isNeutral, matchSingle, matchMultiple, getWeights, getDimensionScores, chooseModel, groundingEvidence, validateCandidates, buildRanking, validatePreferences, analyze, DIMENSIONS, STABLE_SEARCH_MODELS, RESULT_SOURCE_STATUS };
