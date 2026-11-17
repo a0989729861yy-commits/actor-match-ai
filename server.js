@@ -8,182 +8,14 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-
-const CANDIDATES = [
-  {
-    id: 1,
-    name: '林知遠',
-    category: '演員',
-    appearance: ['清新自然', '優雅知性'],
-    personality: ['溫柔親切', '沉穩內斂'],
-    genres: ['愛情', '劇情'],
-    performance: ['自然寫實', '情感細膩'],
-    experience: '發展中演員',
-    viewing: {
-      platform: ['串流平台'],
-      duration: ['30～60 分鐘', '60～120 分鐘'],
-      quality: ['Full HD', '4K 高畫質']
-    },
-    description: '擅長細膩情感與自然演出的示範演員。',
-    evidence: {
-      sourceStatus: 'demo',
-      note: '此為課堂專題示範資料，僅作為本地規則式比對使用，不代表真實人物。',
-      verifiedAt: '2026-11-13',
-      sourceUrls: ['https://example.com/demo-matchlens-profile']
-    },
-    works: [
-      { title: '示範作品 A', type: '影集', year: '2025', url: 'https://example.com/demo-work-a' },
-      { title: '示範作品 B', type: '電影', year: '2024', url: 'https://example.com/demo-work-b' }
-    ]
-  },
-  {
-    id: 2,
-    name: '陳宇辰',
-    category: '演員',
-    appearance: ['陽光活潑', '個性時尚'],
-    personality: ['幽默風趣', '熱情活潑'],
-    genres: ['喜劇', '動作'],
-    performance: ['幽默誇張', '感染力強'],
-    experience: '新生代演員',
-    viewing: {
-      platform: ['免費影音平台', '串流平台'],
-      duration: ['30 分鐘以內', '30～60 分鐘'],
-      quality: ['Full HD']
-    },
-    description: '擅長活潑角色與喜劇表現的示範演員。',
-    evidence: {
-      sourceStatus: 'demo',
-      note: '此為課堂專題示範資料，僅作為本地規則式比對使用，不代表真實人物。',
-      verifiedAt: '2026-11-13',
-      sourceUrls: ['https://example.com/demo-matchlens-profile']
-    },
-    works: [
-      { title: '示範作品 C', type: '影集', year: '2025', url: 'https://example.com/demo-work-c' },
-      { title: '示範作品 D', type: '電影', year: '2024', url: 'https://example.com/demo-work-d' }
-    ]
-  },
-  {
-    id: 3,
-    name: '周以安',
-    category: '演員',
-    appearance: ['成熟穩重', '優雅知性'],
-    personality: ['自信獨立', '沉穩內斂'],
-    genres: ['懸疑', '劇情'],
-    performance: ['自然寫實', '風格多變'],
-    experience: '資深演員',
-    viewing: {
-      platform: ['電影院', '串流平台'],
-      duration: ['60～120 分鐘', '120 分鐘以上'],
-      quality: ['4K 高畫質']
-    },
-    description: '擅長懸疑及劇情類作品的示範演員。',
-    evidence: {
-      sourceStatus: 'demo',
-      note: '此為課堂專題示範資料，僅作為本地規則式比對使用，不代表真實人物。',
-      verifiedAt: '2026-11-13',
-      sourceUrls: ['https://example.com/demo-matchlens-profile']
-    },
-    works: [
-      { title: '示範作品 E', type: '影集', year: '2025', url: 'https://example.com/demo-work-e' },
-      { title: '示範作品 F', type: '戲劇', year: '2023', url: 'https://example.com/demo-work-f' }
-    ]
-  },
-  {
-    id: 4,
-    name: '許晨曦',
-    category: '演員',
-    appearance: ['清新自然', '陽光活潑'],
-    personality: ['熱情活潑', '溫柔親切'],
-    genres: ['愛情', '喜劇', '動畫'],
-    performance: ['感染力強', '情感細膩'],
-    experience: '新生代演員',
-    viewing: {
-      platform: ['免費影音平台', '串流平台'],
-      duration: ['30 分鐘以內', '30～60 分鐘'],
-      quality: ['一般畫質即可', 'Full HD']
-    },
-    description: '擅長輕鬆故事與溫暖角色的示範演員。',
-    evidence: {
-      sourceStatus: 'demo',
-      note: '此為課堂專題示範資料，僅作為本地規則式比對使用，不代表真實人物。',
-      verifiedAt: '2026-11-13',
-      sourceUrls: ['https://example.com/demo-matchlens-profile']
-    },
-    works: [
-      { title: '示範作品 G', type: '影集', year: '2025', url: 'https://example.com/demo-work-g' },
-      { title: '示範作品 H', type: '動畫', year: '2024', url: 'https://example.com/demo-work-h' }
-    ]
-  },
-  {
-    id: 5,
-    name: '張承翰',
-    category: '演員',
-    appearance: ['成熟穩重', '個性時尚'],
-    personality: ['自信獨立', '幽默風趣'],
-    genres: ['動作', '科幻', '懸疑'],
-    performance: ['感染力強', '風格多變'],
-    experience: '發展中演員',
-    viewing: {
-      platform: ['電影院', '串流平台'],
-      duration: ['60～120 分鐘', '120 分鐘以上'],
-      quality: ['4K 高畫質']
-    },
-    description: '擅長科幻與動作題材的示範演員。',
-    evidence: {
-      sourceStatus: 'demo',
-      note: '此為課堂專題示範資料，僅作為本地規則式比對使用，不代表真實人物。',
-      verifiedAt: '2026-11-13',
-      sourceUrls: ['https://example.com/demo-matchlens-profile']
-    },
-    works: [
-      { title: '示範作品 I', type: '電影', year: '2025', url: 'https://example.com/demo-work-i' },
-      { title: '示範作品 J', type: '影集', year: '2024', url: 'https://example.com/demo-work-j' }
-    ]
-  },
-  {
-    id: 6,
-    name: '葉思妤',
-    category: '演員',
-    appearance: ['清新自然', '優雅知性'],
-    personality: ['溫柔親切', '自信獨立'],
-    genres: ['紀錄片', '劇情', '愛情'],
-    performance: ['自然寫實', '情感細膩'],
-    experience: '資深演員',
-    viewing: {
-      platform: ['串流平台', '電視'],
-      duration: ['60～120 分鐘'],
-      quality: ['Full HD', '4K 高畫質']
-    },
-    description: '擅長寫實敘事與細膩情感表現的示範演員。',
-    evidence: {
-      sourceStatus: 'demo',
-      note: '此為課堂專題示範資料，僅作為本地規則式比對使用，不代表真實人物。',
-      verifiedAt: '2026-11-13',
-      sourceUrls: ['https://example.com/demo-matchlens-profile']
-    },
-    works: [
-      { title: '示範作品 K', type: '紀錄片', year: '2024', url: 'https://example.com/demo-work-k' },
-      { title: '示範作品 L', type: '劇情', year: '2023', url: 'https://example.com/demo-work-l' }
-    ]
-  }
-];
-
-const neutralValues = new Set([
-  '沒有特別偏好',
-  '沒有特別要求',
-  '皆可',
-  '無限制',
-  '不拘',
-  '不限資歷',
-  '不限平台',
-  '不限片長',
-  '作品類型不限'
-]);
+const DIMENSIONS = ['外型風格', '氣質人設', '作品類型', '表演風格', '資歷區間', '觀看情境'];
+const NEUTRAL_VALUES = new Set(['沒有特別偏好', '沒有特別要求', '皆可', '無限制', '不拘', '不限資歷', '不限平台', '不限片長', '作品類型不限']);
 
 function isNeutral(value) {
-  return typeof value === 'string' && neutralValues.has(value);
+  return typeof value === 'string' && NEUTRAL_VALUES.has(value);
 }
 
+// Keep the existing six-dimension match and weight normalization rules.
 function matchSingle(preference, options) {
   if (isNeutral(preference)) return 100;
   if (preference === undefined || preference === null || preference === '') return 0;
@@ -199,6 +31,17 @@ function matchMultiple(selected, options) {
   return Math.round((matched.length / selected.length) * 100);
 }
 
+function getWeights(preferences) {
+  const savedWeights = Array.isArray(preferences.weights) ? preferences.weights : [];
+  const items = DIMENSIONS.map((name, index) => savedWeights.find(item => item && item.name === name) || savedWeights[index]);
+  const rawScores = items.map(item => Number(item?.score));
+  const hasValidRawScores = rawScores.every(value => Number.isFinite(value) && value > 0);
+  const source = hasValidRawScores ? rawScores : items.map(item => Number(item?.percentage));
+  const total = source.reduce((sum, value) => sum + value, 0);
+  if (!source.every(value => Number.isFinite(value) && value >= 0) || total <= 0) return DIMENSIONS.map(() => 100 / DIMENSIONS.length);
+  return source.map(value => value / total * 100);
+}
+
 function getDimensionScores(preferences, person) {
   const viewing = preferences.viewing || {};
   const personViewing = person.viewing || {};
@@ -207,204 +50,128 @@ function getDimensionScores(preferences, person) {
     matchSingle(viewing.duration, personViewing.duration) +
     matchSingle(viewing.quality, personViewing.quality)
   ) / 3;
-
   return [
-    { name: '外型風格', score: matchSingle(preferences.appearance, person.appearance) },
-    { name: '氣質人設', score: matchSingle(preferences.personality, person.personality) },
-    { name: '作品類型', score: matchMultiple(preferences.genres, person.genres) },
-    { name: '表演風格', score: matchSingle(preferences.performance, person.performance) },
-    { name: '資歷區間', score: matchSingle(preferences.experience, person.experience) },
-    { name: '觀看情境', score: Math.round(viewingScore) }
+    { name: DIMENSIONS[0], score: matchSingle(preferences.appearance, person.appearance) },
+    { name: DIMENSIONS[1], score: matchSingle(preferences.personality, person.personality) },
+    { name: DIMENSIONS[2], score: matchMultiple(preferences.genres, person.genres) },
+    { name: DIMENSIONS[3], score: matchSingle(preferences.performance, person.performance) },
+    { name: DIMENSIONS[4], score: matchSingle(preferences.experience, person.experience) },
+    { name: DIMENSIONS[5], score: Math.round(viewingScore) }
   ];
 }
 
-function getWeights(preferences) {
-  const names = ['外型風格', '氣質人設', '作品類型', '表演風格', '資歷區間', '觀看情境'];
-  const savedWeights = Array.isArray(preferences.weights) ? preferences.weights : [];
-  const items = names.map((name, index) => savedWeights.find(item => item && item.name === name) || savedWeights[index]);
-  const rawScores = items.map(item => Number(item?.score));
-  const hasValidRawScores = rawScores.every(value => Number.isFinite(value) && value > 0);
-  const source = hasValidRawScores ? rawScores : items.map(item => Number(item?.percentage));
-  const validSource = source.every(value => Number.isFinite(value) && value >= 0);
-  const total = source.reduce((sum, value) => sum + value, 0);
-
-  if (!validSource || total <= 0) return names.map(() => 100 / names.length);
-  return source.map(value => (value / total) * 100);
+function parseJson(text) {
+  const cleaned = String(text || '').replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if (start < 0 || end < start) throw new Error('Gemini 沒有回傳可讀取的搜尋結果。');
+  return JSON.parse(cleaned.slice(start, end + 1));
 }
 
-function buildRanking(preferences) {
-  const weights = getWeights(preferences);
-  const ranked = CANDIDATES.map(person => {
-    const dimensions = getDimensionScores(preferences, person);
-    const total = dimensions.reduce((sum, item, index) => sum + (item.score * weights[index]) / 100, 0);
-    return {
-      person,
-      dimensions,
-      total: Math.round(total * 10) / 10,
-      sourceStatus: person.evidence?.sourceStatus || 'demo'
-    };
-  }).sort((a, b) => b.total - a.total);
-
-  return ranked.slice(0, 3).map((item, index) => ({
-    rank: index + 1,
-    name: item.person.name,
-    category: item.person.category,
-    score: item.total,
-    description: item.person.description,
-    personId: item.person.id,
-    dimensions: item.dimensions,
-    works: item.person.works || [],
-    sourceStatus: item.sourceStatus,
-    evidence: item.person.evidence || { sourceStatus: 'demo', note: '無可驗證公開資料' },
-    bestMatches: item.dimensions
-      .filter(d => d.score >= 80)
-      .map(d => d.name),
-    gaps: item.dimensions
-      .filter(d => d.score < 50)
-      .map(d => d.name)
-  }));
+function getGroundedUrls(data) {
+  const chunks = data?.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+  return [...new Set(chunks.map(chunk => chunk.web?.uri).filter(url => {
+    try { return ['http:', 'https:'].includes(new URL(url).protocol); } catch { return false; }
+  }))];
 }
 
-async function callGemini(preferences, ranking) {
+async function searchAndAnalyze(preferences) {
   if (!GEMINI_API_KEY) {
-    return {
-      enabled: false,
-      summary: 'Gemini 未啟用：未設定 GEMINI_API_KEY，已退回本地規則式推薦結果。',
-      recommendationReason: '本地規則式計分已完成，推薦結果依六維度權重排序。'
-    };
+    const error = new Error('Gemini AI 適配分析服務尚未啟用：伺服器未設定 GEMINI_API_KEY。未執行人物搜尋，也未產生推薦。');
+    error.status = 503;
+    throw error;
   }
 
-  const prompt = `
-你是一位嚴格的資料性推薦助理。僅以提供的資料為基礎生成推薦理由，不要編造人物、作品或公開資料。
+  const prompt = `你是以公開網頁搜尋結果為依據的人物資料研究助理。請依使用者偏好搜尋真實、可查證的演員或人物，並從搜尋到的公開網頁整理最多 5 位適合者。不能用虛構人物、示範資料、猜測或模型記憶填補搜尋結果；找不到可靠來源就回傳空 candidates。使用者偏好：\n${JSON.stringify(preferences)}\n\n只輸出 JSON：{"summary":"...","recommendationReason":"依搜尋證據撰寫的簡短說明","candidates":[{"name":"公開人物姓名","category":"演員","appearance":["只填有來源支持且符合問卷選項的標籤"],"personality":["..."],"genres":["..."],"performance":["..."],"experience":"...","viewing":{"platform":["..."],"duration":["..."],"quality":["..."]},"description":"有來源支持的簡介","works":[{"title":"可查證作品","type":"...","year":"...","url":"搜尋來源中的作品網址"}],"sourceUrls":["必須逐字取自本次 Google 搜尋結果的網址"]}]}。六維度標籤只能使用問卷選項；沒有來源證據時回傳空陣列或空字串。每人需至少有一個本次搜尋提供的 sourceUrls。人物可用來源必須取自搜尋結果，不可自行編造 URL。\n外型選項：清新自然、成熟穩重、陽光活潑、優雅知性、個性時尚。氣質選項：溫柔親切、幽默風趣、自信獨立、沉穩內斂、熱情活潑。類型：喜劇、愛情、科幻、懸疑、動作、劇情、紀錄片、動畫。表演：自然寫實、情感細膩、幽默誇張、感染力強、風格多變。資歷：新生代演員、發展中演員、資深演員。觀看平台：串流平台、電影院、電視、免費影音平台；片長：30 分鐘以內、30～60 分鐘、60～120 分鐘、120 分鐘以上；畫質：一般畫質即可、Full HD、4K 高畫質。偏好 JSON 僅供標籤比對，觀看情境只在來源有明確資料時填寫。`;
 
-使用者偏好：
-${JSON.stringify(preferences, null, 2)}
-
-候選名單：
-${JSON.stringify(ranking, null, 2)}
-
-任務：
-1. 若資料是示範資料，明確寫出「此為示範資料，未驗證為真實公開人物」。
-2. 若缺乏證據，寫出「資料不足」。
-3. 只輸出簡短、清楚的 JSON 物件，格式：
-{
-  "summary": "...",
-  "recommendationReason": "...",
-  "keyStrengths": ["..."],
-  "dataLimit": "..."
-}
-`;
-
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-goog-api-key': GEMINI_API_KEY
-    },
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
     body: JSON.stringify({
-      system_instruction: {
-        parts: [{ text: '你是一位有證據意識的推薦助理，必須避免捏造資料與公開人物事實。只基於提供內容回答，不可編造。' }]
-      },
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 800 }
+      tools: [{ google_search: {} }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 3000 }
     })
   });
-
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini request failed: ${response.status} ${errorText}`);
+    const error = new Error(`Gemini/Google 搜尋服務回應 ${response.status}；未產生推薦結果。`);
+    error.status = response.status === 401 || response.status === 403 ? 503 : 502;
+    throw error;
   }
 
   const data = await response.json();
-  const text = data?.candidates?.[0]?.content?.parts?.map(part => part.text).join('\n') || '{}';
-
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch (error) {
-    parsed = {
-      summary: 'Gemini 生成結果已取得，但回傳格式非 JSON；已回退為本地規則式說明。',
-      recommendationReason: text.slice(0, 300),
-      keyStrengths: ['已處理推薦邏輯'],
-      dataLimit: 'Gemini 回傳格式需為 JSON，請檢查實際回答內容。'
+  const text = data?.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('\n') || '';
+  const result = parseJson(text);
+  const groundedUrls = new Set(getGroundedUrls(data));
+  const candidates = (Array.isArray(result.candidates) ? result.candidates : []).map((person, index) => {
+    const sourceUrls = (Array.isArray(person.sourceUrls) ? person.sourceUrls : []).filter(url => groundedUrls.has(url));
+    return {
+      id: index + 1,
+      name: String(person.name || '').trim(),
+      category: String(person.category || '人物'),
+      appearance: Array.isArray(person.appearance) ? person.appearance : [],
+      personality: Array.isArray(person.personality) ? person.personality : [],
+      genres: Array.isArray(person.genres) ? person.genres : [],
+      performance: Array.isArray(person.performance) ? person.performance : [],
+      experience: String(person.experience || ''),
+      viewing: person.viewing && typeof person.viewing === 'object' ? person.viewing : {},
+      description: String(person.description || ''),
+      works: Array.isArray(person.works) ? person.works.filter(work => work && typeof work.title === 'string').map(work => ({
+        title: work.title,
+        type: String(work.type || ''),
+        year: String(work.year || ''),
+        url: groundedUrls.has(work.url) ? work.url : ''
+      })) : [],
+      evidence: { sourceStatus: sourceUrls.length ? 'search-grounded' : 'unverified', sourceUrls, note: sourceUrls.length ? '本次 Gemini Google 搜尋提供的來源；請開啟來源自行核對，非人工查證。' : '沒有可與本次搜尋 grounding 資料核對的來源。' }
     };
-  }
+  }).filter(person => person.name && person.evidence.sourceUrls.length > 0);
 
-  return {
-    enabled: true,
-    summary: parsed.summary || 'Gemini 已補充說明。',
-    recommendationReason: parsed.recommendationReason || 'Gemini 未提供有效推薦理由。',
-    keyStrengths: parsed.keyStrengths || [],
-    dataLimit: parsed.dataLimit || '資料來源需經公開驗證後才可納入正式標籤。'
-  };
+  if (candidates.length === 0) {
+    const error = new Error('人物搜尋沒有找到附有可核對公開來源的人物；未以虛構資料補足。');
+    error.status = 404;
+    throw error;
+  }
+  return { summary: String(result.summary || '已完成有來源的人物搜尋。'), recommendationReason: String(result.recommendationReason || '推薦依據本次搜尋資料及六維度規則計分。'), candidates };
+}
+
+function buildRanking(preferences, candidates) {
+  const weights = getWeights(preferences);
+  return candidates.map(person => {
+    const dimensions = getDimensionScores(preferences, person);
+    const score = Math.round(dimensions.reduce((sum, item, index) => sum + item.score * weights[index] / 100, 0) * 10) / 10;
+    return {
+      rank: 0, name: person.name, category: person.category, score,
+      description: person.description, personId: person.id, dimensions,
+      works: person.works, sourceStatus: person.evidence.sourceStatus,
+      evidence: person.evidence,
+      bestMatches: dimensions.filter(item => item.score >= 80).map(item => item.name),
+      gaps: dimensions.filter(item => item.score < 50).map(item => item.name)
+    };
+  }).sort((a, b) => b.score - a.score).slice(0, 5).map((person, index) => ({ ...person, rank: index + 1 }));
 }
 
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/api/health', (req, res) => {
-  res.json({
-    ok: true,
-    status: 'healthy',
-    geminiConfigured: Boolean(GEMINI_API_KEY),
-    model: GEMINI_MODEL,
-    demoMode: true
-  });
+  res.json({ ok: true, status: 'healthy', geminiConfigured: Boolean(GEMINI_API_KEY), model: GEMINI_MODEL, searchGrounding: Boolean(GEMINI_API_KEY) });
 });
 
 app.post('/api/recommendations', async (req, res) => {
   try {
-    const preferences = req.body || {};
-    if (!preferences || typeof preferences !== 'object') {
-      return res.status(400).json({ error: '請提供有效的偏好資料。' });
-    }
-
-    const ranking = buildRanking(preferences);
-
-    const ai = await callGemini(preferences, ranking).catch(error => ({
-      enabled: false,
-      summary: 'Gemini 調用失敗，已回退為本地推薦結果。',
-      recommendationReason: error.message || 'Gemini API 呼叫失敗。',
-      keyStrengths: [],
-      dataLimit: '請確認 GEMINI_API_KEY、GEMINI_MODEL 及網路連線狀態。'
-    }));
-
-    const response = {
-      ok: true,
-      summary: ai.summary || '已完成六維度推薦。',
-      recommendationReason: ai.recommendationReason || '已依六維度權重排序。',
-      dataLimit: ai.dataLimit || '目前為示範資料模式，資料需另行驗證。',
-      geminiEnabled: ai.enabled,
-      ranking,
-      sources: ranking.map(item => ({
-        name: item.name,
-        status: item.sourceStatus || 'demo',
-        note: item.evidence?.note || '示範資料，尚未驗證為真實公開人物。',
-        urls: item.evidence?.sourceUrls || [],
-        works: item.works || []
-      }))
-    };
-
-    return res.json(response);
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) return res.status(400).json({ ok: false, error: '請提供有效的偏好資料。' });
+    const analysis = await searchAndAnalyze(req.body);
+    const ranking = buildRanking(req.body, analysis.candidates);
+    return res.json({ ok: true, summary: analysis.summary, recommendationReason: analysis.recommendationReason, geminiEnabled: true, searchPerformed: true, ranking });
   } catch (error) {
-    console.error('Recommendation error:', error);
-    return res.status(500).json({
-      ok: false,
-      error: '推薦生成失敗，請稍後再試。',
-      detail: error.message || 'Unknown error'
-    });
+    const status = Number.isInteger(error.status) && error.status >= 400 && error.status < 600 ? error.status : 502;
+    return res.status(status).json({ ok: false, serviceEnabled: Boolean(GEMINI_API_KEY), error: error.message || '適配分析服務暫時無法使用。' });
   }
 });
 
 app.use(express.static(path.join(__dirname, '.')));
-
-app.get('*', (req, res) => {
-  const indexFile = path.join(__dirname, 'index.html');
-  res.sendFile(indexFile);
-});
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 app.listen(PORT, () => {
   console.log(`[MatchLens] Server running at http://localhost:${PORT}`);
-  if (!GEMINI_API_KEY) {
-    console.log('[MatchLens] GEMINI_API_KEY 未設定：將以本地規則式推薦模式運作。');
-  }
+  if (!GEMINI_API_KEY) console.log('[MatchLens] Gemini AI 適配分析服務尚未啟用：請在伺服器環境設定 GEMINI_API_KEY。');
 });
